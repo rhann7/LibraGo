@@ -19,17 +19,25 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+export default function Profile({ mustVerifyEmail, status, avatar, bio }: { 
+    mustVerifyEmail: boolean; 
+    status?: string;
+    avatar?: string;
+    bio?: string;
+}) {
     const { auth } = usePage().props as any;
 
-    const { data, setData, patch, processing, errors, recentlySuccessful } = useForm({
+    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         name: auth.user.name,
         email: auth.user.email,
+        avatar: null as File | null,
+        bio: bio ?? '',
+        _method: 'patch',
     });
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        patch(route('profile.update'), { preserveScroll: true });
+        post(route('profile.update'), { preserveScroll: true, forceFormData: true });
     };
 
     return (
@@ -47,6 +55,21 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             <Label htmlFor="name">Name</Label>
                             <Input id="name" className="mt-1 block w-full" value={data.name} onChange={e => setData('name', e.target.value)} required autoComplete="name" placeholder="Full name" />
                             <InputError className="mt-2" message={errors.name} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="avatar">Avatar</Label>
+                            {avatar && (
+                                <img src={avatar} alt="Avatar" className="h-16 w-16 rounded-full object-cover" />
+                            )}
+                            <Input id="avatar" type="file" accept="image/jpg,image/jpeg,image/png,image/webp" className="mt-1 block w-full" onChange={e => setData('avatar', e.target.files?.[0] ?? null)} />
+                            <InputError className="mt-2" message={errors.avatar} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="bio">Bio</Label>
+                            <textarea id="bio" className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" rows={3} placeholder="Tell us about yourself" value={data.bio} onChange={e => setData('bio', e.target.value)} />
+                            <InputError className="mt-2" message={errors.bio} />
                         </div>
 
                         <div className="grid gap-2">

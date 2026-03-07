@@ -15,6 +15,7 @@ class User extends Authenticatable
 
     protected $fillable = ['name', 'email', 'password'];
     protected $hidden = ['password', 'remember_token'];
+    protected $appends = ['avatar_url'];
     protected function casts(): array
     {
         return ['password' => 'hashed', 'email_verified_at' => 'datetime'];
@@ -28,4 +29,6 @@ class User extends Authenticatable
 
     public function isStudent() { return $this->hasRole('student'); }
     public function isTeacher() { return $this->hasRole('teacher'); }
+
+    public function getAvatarUrlAttribute(): ?string { $profile = $this->student ?? $this->teacher; return $profile?->avatar_url; }
 }
