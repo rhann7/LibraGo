@@ -10,8 +10,8 @@ import type { NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     { title: 'Profile', href: route('profile.edit'), icon: null },
-    { title: 'Password', href: route('password.edit'), icon: null },
-    { title: 'Appearance', href: route('appearance'), icon: null },
+    { title: 'Password', href: route('user-password.edit'), icon: null },
+    { title: 'Appearance', href: route('appearance.edit'), icon: null },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {

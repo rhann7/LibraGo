@@ -14,7 +14,7 @@ import type { BreadcrumbItem } from '@/types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Password settings',
-        href: route('password.edit'),
+        href: route('user-password.edit'),
     },
 ];
 
@@ -30,7 +30,7 @@ export default function Password() {
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('password.update'), {
+        put(route('user-password.update'), {
             preserveScroll: true,
             onSuccess: () => reset(),
             onError: (errors) => {
