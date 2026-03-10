@@ -1,8 +1,9 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { LayoutGrid, LogOut, Settings } from 'lucide-react';
 import { route } from 'ziggy-js';
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
+import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import type { User } from '@/types';
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function UserMenuContent({ user }: Props) {
+    const { isCurrentUrl } = useCurrentUrl();
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
@@ -29,6 +31,14 @@ export function UserMenuContent({ user }: Props) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+                {!isCurrentUrl(route('dashboard')) && (
+                    <DropdownMenuItem asChild>
+                        <Link className="block w-full cursor-pointer" href={route('dashboard')} onClick={cleanup}>
+                            <LayoutGrid className="mr-2" />
+                            Dashboard
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                     <Link className="block w-full cursor-pointer" href={route('profile.edit')} prefetch onClick={cleanup}>
                         <Settings className="mr-2" />
