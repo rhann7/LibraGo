@@ -27,6 +27,7 @@ class User extends Authenticatable
     public function scopeStudents($query) { return $query->role('student'); }
     public function scopeTeachers($query) { return $query->role('teacher'); }
 
+    public function isAdmin() { return $this->hasRole('admin'); }
     public function isStudent() { return $this->hasRole('student'); }
     public function isTeacher() { return $this->hasRole('teacher'); }
 
