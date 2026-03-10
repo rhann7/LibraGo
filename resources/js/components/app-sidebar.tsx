@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid, Library } from 'lucide-react';
 import { route } from 'ziggy-js';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -12,6 +12,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: route('dashboard'),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Book Categories',
+        href: route('books.categories.index'),
+        icon: Library,
     },
 ];
 

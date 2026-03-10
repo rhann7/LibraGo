@@ -1,8 +1,9 @@
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import PageHeader from '@/components/page-header';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Auth } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,21 +14,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Dashboard() {
     const { auth } = usePage().props;
-    const roles = (auth as Auth).roles;
+    const roles = auth.roles;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
+
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                            {`Welcome back, ${auth.user.name}`}
-                        </h2>
-                        
-                        <p className="text-sm text-muted-foreground">{`Logged in as ${roles}`}</p>
-                    </div>
-                </div>
+                <PageHeader title={`Welcome back, ${auth.user.name.split(' ')[0]}`} description={`You are logged in as ${roles}`} />
 
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
