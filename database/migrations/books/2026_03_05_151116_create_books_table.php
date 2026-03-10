@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('book_category_id')->nullable()->constrained()->nullOnDelete();
             $table->string('title');
             $table->string('slug')->unique();
             $table->string('author');
