@@ -12,7 +12,7 @@ import type { Auth } from '@/types';
 
 const navItems = [
     { title: 'Home', href: '#' },
-    { title: 'Books', href: '#' },
+    { title: 'Books', href: route('books.index') },
     { title: 'Categories', href: route('books.categories.index') },
     { title: 'Authors', href: '#' },
     { title: 'Publishers', href: '#' },
