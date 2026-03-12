@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('book_category_id')->nullable()->constrained()->nullOnDelete();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->string('author');
-            $table->string('publisher');
+            $table->string('author')->nullable();
+            $table->string('publisher')->nullable();
             $table->string('isbn')->unique()->nullable();
             $table->string('cover')->nullable();
             $table->year('year');
