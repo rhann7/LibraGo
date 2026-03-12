@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { LayoutGrid, LogOut, Settings } from 'lucide-react';
 import { route } from 'ziggy-js';
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -12,6 +12,7 @@ type Props = {
 };
 
 export function UserMenuContent({ user }: Props) {
+    const { url } = usePage();
     const { isCurrentUrl } = useCurrentUrl();
     const cleanup = useMobileNavigation();
 
@@ -31,7 +32,7 @@ export function UserMenuContent({ user }: Props) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                {!isCurrentUrl(route('dashboard')) && (
+                {!url.startsWith('/settings') && !isCurrentUrl(route('dashboard')) && (
                     <DropdownMenuItem asChild>
                         <Link className="block w-full cursor-pointer" href={route('dashboard')} onClick={cleanup}>
                             <LayoutGrid className="mr-2" />
