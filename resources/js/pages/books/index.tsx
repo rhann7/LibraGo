@@ -1,5 +1,5 @@
-import { router } from "@inertiajs/react";
-import { BookOpen, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { router, Link as InertiaLink } from "@inertiajs/react";
+import { BookOpen, ChevronLeft, ChevronRight, Inbox, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import InputError from '@/components/input-error';
@@ -12,12 +12,28 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useBookForm } from "@/hooks/use-book-form";
 import DataTableLayout from "@/layouts/data-table-layout";
+import UserLayout from "@/layouts/user-layout";
 import type { Book, BreadcrumbItem, Can } from "@/types";
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: route('dashboard') },
     { title: 'Books', href: route('books.index') },
 ];
+
+const gradients = [
+    'from-slate-700 to-slate-900',
+    'from-pink-700 to-rose-900',
+    'from-violet-700 to-purple-900',
+    'from-blue-700 to-cyan-900',
+    'from-amber-700 to-orange-900',
+    'from-green-700 to-emerald-900',
+    'from-yellow-600 to-orange-800',
+    'from-red-800 to-gray-900',
+    'from-indigo-700 to-violet-900',
+    'from-teal-700 to-cyan-900',
+];
+
+const getGradient = (id: number) => gradients[id % gradients.length];
 
 interface Props {
     books: { 
@@ -247,5 +263,96 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                 </DialogContent>
             </Dialog>
         </>
+    );
+
+    return (
+        <UserLayout title="Books">
+            <div className="space-y-8">
+                <div>
+                    <h1 className="text-2xl font-bold trackling-tight">All Books</h1>
+                    <p className="mt-1 text-sm text-muted-foreground">Browse our book collection</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input defaultValue={filters.search ?? ''} onInput={handleSearch} placeholder="Search books..." className="pl-9 w-64" />
+                    </div>
+
+                    {categories.length > 0 && (
+                        <Select value={filters.category?.toString() ?? 'all'} onValueChange={(val) => router.get(route('books.index'), { ...filters, category: val === 'all' ? undefined : val }, { preserveState: true, replace: true })}>
+                            <SelectTrigger className="w-48">
+                                <SelectValue placeholder="All Categories" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Categories</SelectItem>
+                                {categories.map(c => (
+                                    <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+
+                    <Input type="number" placeholder="Year" className="w-28" defaultValue={filters.year ?? ''} onInput={(e) => router.get(route('books.index'), { ...filters, year: e.currentTarget.value || undefined }, { preserveState: true, replace: true })} />
+                </div>
+
+                {books.data.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
+                        <div className="rounded-md bg-muted p-3">
+                            <Inbox className="h-6 w-6 text-muted-foreground/60" />
+                        </div>
+                        <p className="text-sm font-medium">No books found</p>
+                        <p className="text-xs text-muted-foreground">Try adjusting your search or filters.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
+                        {books.data.map(book => (
+                            <div key={book.id} className="flex flex-col rounded-md border border-border overflow-hidden">
+                                <div className="relative">
+                                    {book.cover_url ? (
+                                        <img src={book.cover_url} alt={book.title} className="aspect-2/3 w-full object-cover" />
+                                    ) : (
+                                        <div className={`bg-linear-to-br ${getGradient(book.category?.id ?? book.id)} aspect-2/3 w-full`} />
+                                    )}
+                                    {book.category && (
+                                        <span className="absolute top-2 right-2 rounded-sm bg-black/60 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
+                                            {book.category.name}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-2 p-3">
+                                    <div className="space-y-0.5">
+                                        <p className="text-sm font-semibold leading-tight">{book.title}</p>
+                                        <p className="text-xs text-muted-foreground">{book.author ?? 'Unknown'}</p>
+                                    </div>
+                                    <InertiaLink href="#" className="inline-flex w-full items-center justify-center rounded-sm bg-foreground px-3 py-1.5 text-xs text-background hover:opacity-90">
+                                        Book Details
+                                    </InertiaLink>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {books.links.length > 3 && (
+                    <div className="flex items-center justify-center gap-1">
+                        {books.links.map((link, i) => {
+                            const isNext = link.label.includes('Next');
+                            const isPrev = link.label.includes('Previous');
+                            return link.url ? (
+                                <InertiaLink key={i} href={link.url} preserveScroll className={`flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-xs font-medium transition-colors ${link.active ? 'bg-foreground text-background' : 'border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground'}`}>
+                                    {isPrev ? <ChevronLeft className="h-4 w-4" /> : isNext ? <ChevronRight className="h-4 w-4" /> : link.label}
+                                </InertiaLink>
+                            ) : (
+                                <span key={i} className="flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-xs text-muted-foreground/40 opacity-50">
+                                    {isPrev ? <ChevronLeft className="h-4 w-4" /> : isNext ? <ChevronRight className="h-4 w-4" /> : link.label}
+                                </span>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+        </UserLayout>
     );
 };
