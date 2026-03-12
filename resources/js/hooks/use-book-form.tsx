@@ -49,7 +49,7 @@ export function useBookForm() {
 
     const submit = () => {
         if (editing) {
-            form.post(route('books.update', editing.id), {
+            form.post(route('books.update', { book: editing.id }), {
                 forceFormData: true, preserveScroll: true, onSuccess: close
             });
         } else {
