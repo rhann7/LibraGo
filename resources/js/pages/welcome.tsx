@@ -33,7 +33,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                         ) : (
                             <>
                                 <Link href={route('login')} className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm hover:border-[#1915014a] dark:border-[#3E3E3A] dark:hover:border-[#62605b]">
-                                    Masuk
+                                    Sign In
                                 </Link>
                             </>
                         )}
@@ -59,17 +59,17 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 <em className="italic">online!</em>
                             </h1>
                             <p className="text-base text-[#62605b] dark:text-[#a0a09a]">
-                                Website perpustakaan digital untuk kamu!{' '}
+                                A simple digital library built for your school.
                                 <br />
-                                Jelajahi berbagai koleksi buku dengan sistem peminjaman online.
+                                Borrow books easily anytime through a simple digital system.
                             </p>
                             <div className="flex items-center gap-3 pt-2">
-                                <Link href='#' className="inline-block rounded-sm bg-[#1b1b18] px-6 py-2 text-sm text-white hover:bg-[#2d2d28] dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-white">
-                                    Mulai Membaca
+                                <Link href={route('login')} className="inline-block rounded-sm bg-[#1b1b18] px-6 py-2 text-sm text-white hover:bg-[#2d2d28] dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-white">
+                                    Start Reading
                                 </Link>
                                 {!auth.user && canRegister && (
                                     <Link href={route('register')} className="inline-block rounded-sm border border-[#19140035] px-6 py-2 text-sm hover:border-[#1915014a] dark:border-[#3E3E3A]">
-                                        Buat Akun
+                                        Sign Up
                                     </Link>
                                 )}
                             </div>
@@ -87,7 +87,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                 </main>
 
                 <footer className="py-6 text-center text-xs text-[#62605b] dark:text-[#a0a09a]">
-                    © {new Date().getFullYear()} <span className="font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">LibraGo</span>. Hak cipta dilindungi undang-undang.
+                    © {new Date().getFullYear()} <span className="font-semibold text-foreground">LibraGo</span>. All rights reserved.
                 </footer>
             </div>
         </>
