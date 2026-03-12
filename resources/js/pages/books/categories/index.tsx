@@ -147,9 +147,7 @@ export default function BookCategoryIndex({ categories, filters, can }: Props) {
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={close}>Cancel</Button>
-                            <Button type="submit" disabled={form.processing}>
-                                {editing ? 'Update' : 'Create'}
-                            </Button>
+                            <Button type="submit" disabled={form.processing}>{editing ? 'Update' : 'Create'}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -185,9 +183,7 @@ export default function BookCategoryIndex({ categories, filters, can }: Props) {
                                 <div className={`bg-linear-to-br ${getGradient(category.id)} h-32 w-full transition-opacity group-hover:opacity-90`} />
                                 <div className="absolute inset-0 flex flex-col justify-end p-4">
                                     <span className="font-semibold text-white">{category.name}</span>
-                                    <span className="text-xs text-white/70">
-                                        {category.books_count} {category.books_count === 1 ? 'book' : 'books'}
-                                    </span>
+                                    <span className="text-xs text-white/70">{category.books_count} {category.books_count === 1 ? 'book' : 'books'}</span>
                                 </div>
                             </InertiaLink>
                         ))}
