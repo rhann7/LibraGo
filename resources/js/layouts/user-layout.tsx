@@ -4,9 +4,9 @@ import { type PropsWithChildren } from 'react';
 import { route } from 'ziggy-js';
 import AppLogoIcon from '@/components/app-logo-icon';
 import FlashMessage from '@/components/flash-message';
+import { NavUserMenuContent } from '@/components/nav-user-menu-content';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import type { Auth } from '@/types';
 
@@ -59,7 +59,7 @@ export default function UserLayout({ children, title }: UserLayoutProps) {
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end">
-                                <UserMenuContent user={user} />
+                                <NavUserMenuContent user={user} />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
