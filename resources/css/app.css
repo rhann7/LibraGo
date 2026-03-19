@@ -137,6 +137,14 @@
         @apply border-border;
     }
 
+    html {
+        scrollbar-gutter: stable;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+
     body {
         @apply bg-background text-foreground;
     }
