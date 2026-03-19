@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
+import { ChevronRight } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 import { route } from 'ziggy-js';
 import AppLogoIcon from '@/components/app-logo-icon';
@@ -7,7 +8,9 @@ import FlashMessage from '@/components/flash-message';
 import { NavUserMenuContent } from '@/components/nav-user-menu-content';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
+import { cn } from '@/lib/utils';
 import type { Auth } from '@/types';
 
 const navItems = [
@@ -20,11 +23,13 @@ const navItems = [
 
 interface UserLayoutProps extends PropsWithChildren {
     title?: string;
+    breadcrumbs?: { title: string; href?: string }[];
 }
 
-export default function UserLayout({ children, title }: UserLayoutProps) {
+export default function UserLayout({ children, title, breadcrumbs }: UserLayoutProps) {
     const { auth } = usePage().props;
     const { user } = auth as Auth;
+    const { isCurrentUrl } = useCurrentUrl();
     const getInitials = useInitials();
 
     return (
@@ -41,7 +46,7 @@ export default function UserLayout({ children, title }: UserLayoutProps) {
 
                         <nav className="hidden items-center gap-6 text-sm md:flex">
                             {navItems.map(item => (
-                                <Link key={item.title} href={item.href} className="text-muted-foreground transition-colors hover:text-foreground">
+                                <Link key={item.title} href={item.href} className={cn("transition-colors hover:text-foreground text-sm", isCurrentUrl(item.href) ? "text-foreground font-medium" : "text-muted-foreground")}>
                                     {item.title}
                                 </Link>
                             ))}
@@ -67,6 +72,22 @@ export default function UserLayout({ children, title }: UserLayoutProps) {
 
                 <main className="flex-1">
                     <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+                        {breadcrumbs && breadcrumbs.length > 0 && (
+                            <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+                                {breadcrumbs.map((crumb, i) => (
+                                    <span key={i} className="flex items-center gap-2">
+                                        {i > 0 && <ChevronRight className="h-3.5 w-3.5" />}
+                                        {crumb.href ? (
+                                            <Link href={crumb.href} className="hover:text-foreground transition-colors">
+                                                {crumb.title}
+                                            </Link>
+                                        ) : (
+                                            <span className="text-foreground">{crumb.title}</span>
+                                        )}
+                                    </span>
+                                ))}
+                            </nav>
+                        )}
                         {children}
                     </div>
                 </main>
