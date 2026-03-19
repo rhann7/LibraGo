@@ -326,7 +326,7 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                         <p className="text-sm font-semibold leading-tight">{book.title}</p>
                                         <p className="text-xs text-muted-foreground">{book.author ?? 'Unknown'}</p>
                                     </div>
-                                    <InertiaLink href="#" className="inline-flex w-full items-center justify-center rounded-sm bg-foreground px-3 py-1.5 text-xs text-background hover:opacity-90">
+                                    <InertiaLink href={route('books.show', { book: book.id })} className="inline-flex w-full items-center justify-center rounded-sm bg-foreground px-3 py-1.5 text-xs text-background hover:opacity-90">
                                         Book Details
                                     </InertiaLink>
                                 </div>
