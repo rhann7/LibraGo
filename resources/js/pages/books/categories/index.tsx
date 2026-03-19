@@ -179,7 +179,7 @@ export default function BookCategoryIndex({ categories, filters, can }: Props) {
                 ) : (
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                         {categories.data.map(category => (
-                            <InertiaLink key={category.id} href="#" className="group relative overflow-hidden rounded-md">
+                            <InertiaLink key={category.id} href={route('books.index', { category: category.id })} className="group relative overflow-hidden rounded-md">
                                 <div className={`bg-linear-to-br ${getGradient(category.id)} h-32 w-full transition-opacity group-hover:opacity-90`} />
                                 <div className="absolute inset-0 flex flex-col justify-end p-4">
                                     <span className="font-semibold text-white">{category.name}</span>
