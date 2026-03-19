@@ -61,6 +61,13 @@ class BookController extends Controller implements HasMiddleware
         return to_route('books.index')->with('success', 'Book updated successfully');
     }
 
+    public function show(Book $book)
+    {
+        return Inertia::render('books/show', [
+            'book' => $this->transformSingleBook($book),
+        ]);
+    }
+
     public function destroy(Book $book)
     {
         if ($book->cover) Storage::disk('public')->delete($book->cover);
