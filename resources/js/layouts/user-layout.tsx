@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import type { Auth } from '@/types';
 
 const navItems = [
-    { title: 'Home', href: '#' },
+    { title: 'Home', href: route('home') },
     { title: 'Books', href: route('books.index') },
     { title: 'Categories', href: route('books.categories.index') },
     { title: 'Authors', href: '#' },
