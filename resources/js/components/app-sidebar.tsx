@@ -26,9 +26,15 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={route('home')} prefetch>
-                                <AppLogo />
-                            </Link>
+                            {admin ? (
+                                <div className="flex items-center gap-2 px-2">
+                                    <AppLogo />
+                                </div>
+                            ) : (
+                                <Link href={route('home')} prefetch>
+                                    <AppLogo />
+                                </Link>
+                            )}
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
