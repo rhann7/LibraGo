@@ -149,7 +149,7 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <InertiaLink href={route('book-units.index', { search: book.title })}>
-                                                        <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50">
+                                                        <Button size="sm" variant="outline">
                                                             <Boxes className="h-3.5 w-3.5" />
                                                         </Button>
                                                     </InertiaLink>
