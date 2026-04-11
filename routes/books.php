@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Books\BookCategoryController;
 use App\Http\Controllers\Books\BookController;
+use App\Http\Controllers\Books\BookUnitController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -11,5 +12,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::resource('books', BookController::class)
+        ->only(['index', 'store', 'update', 'show', 'destroy']);
+    
+    Route::resource('book-units', BookUnitController::class)
         ->only(['index', 'store', 'update', 'show', 'destroy']);
 });
