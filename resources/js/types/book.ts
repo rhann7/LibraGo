@@ -37,5 +37,6 @@ export type Book = {
         year: number;
         synopsis: string;
         pages: number;
+        units: number;
     };
 };
