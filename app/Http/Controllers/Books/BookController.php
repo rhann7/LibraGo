@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Books\BookRequest;
 use App\Models\Books\Book;
 use App\Models\Books\BookCategory;
+use App\Models\Books\BookUnit;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -43,8 +45,24 @@ class BookController extends Controller implements HasMiddleware
         $data = $request->validated();
         if ($request->hasFile('cover')) $data['cover'] = $request->file('cover')->store('covers', 'public');
 
-        Book::create($data);
-        return to_route('books.index')->with('success', 'Book created successfully');
+        DB::transaction(function () use ($data, $request) {
+            $book = Book::create($data);
+
+            $units = (int) ($request->units ?? 0);
+            if ($units > 0) {
+                for ($i = 0; $i < $units; $i++) {
+                    BookUnit::create([
+                        'book_id'   => $book->id,
+                        'code'      => BookUnit::generateCode(),
+                        'condition' => 'good',
+                        'status'    => 'available',
+                        'note'      => null,
+                    ]);
+                }
+            }
+        });
+
+        return to_route('books.index')->with('success', "Book and {$request->units} units created successfully");
     }
     
     public function update(BookRequest $request, Book $book)
@@ -120,6 +138,7 @@ class BookController extends Controller implements HasMiddleware
                 'year'             => $book->year,
                 'synopsis'         => $book->synopsis ?? '',
                 'pages'            => $book->pages,
+                'units'            => 0,
             ],
         ];
     }
