@@ -19,6 +19,7 @@ export function useBookForm() {
         year: '' as unknown as number,
         synopsis: '',
         pages: '' as unknown as number,
+        units: '' as unknown as number
     });
 
     const setCover = (file: File | null) => {
