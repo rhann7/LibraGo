@@ -1,5 +1,5 @@
 import { router, Link as InertiaLink } from "@inertiajs/react";
-import { BookOpen, ChevronLeft, ChevronRight, Inbox, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { BookOpen, Boxes, ChevronLeft, ChevronRight, Inbox, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import InputError from '@/components/input-error';
@@ -145,6 +145,18 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                 <td className="px-6 py-4">{book.units_count}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex justify-end gap-2">
+                                        <TooltipProvider delayDuration={0}>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <InertiaLink href={route('book-units.index', { search: book.title })}>
+                                                        <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50">
+                                                            <Boxes className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                    </InertiaLink>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Manage Units</TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                         {can.edit && (
                                             <TooltipProvider delayDuration={0}>
                                                 <Tooltip>
@@ -231,6 +243,15 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                     <InputError message={form.errors.isbn} />
                                 </div>
                             </div>
+                            {!editing && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="units" className="text-primary font-semibold">
+                                        Book Units <span className="text-[10px] text-muted-foreground italic">*Automatically create a book unit</span>
+                                    </Label>
+                                    <Input id="units" type="number" value={form.data.units} onChange={e => form.setData('units', Number(e.target.value))} placeholder="10" className="bg-background" />
+                                    <InputError message={form.errors.units} />
+                                </div>
+                            )}
                             <div className="grid gap-2">
                                 <Label htmlFor="synopsis">Synopsis</Label>
                                 <Textarea id="synopsis" value={form.data.synopsis} onChange={e => form.setData('synopsis', e.target.value)} placeholder="Book synopsis..." className="resize-none h-32" />
