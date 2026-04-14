@@ -40,3 +40,26 @@ export type Book = {
         units: number;
     };
 };
+
+export type BookUnit = {
+    id: number;
+    code: string;
+    condition: 'good' | 'damaged';
+    status: 'available' | 'reserved' | 'borrowed' | 'lost';
+    note: string;
+    book: {
+        id: number;
+        title: string;
+        cover_url: string | null;
+        category: {
+            id: number;
+            name: string;
+        } | null;
+    };
+    form_default: {
+        book_id: number;
+        condition: 'good' | 'damaged';
+        status: 'available' | 'reserved' | 'borrowed' | 'lost';
+        note: string;
+    };
+};
