@@ -37,23 +37,23 @@ class BookUnitController extends Controller implements HasMiddleware
         return to_route('book-units.index')->with('success', 'Unit created successfully with code ' . $data['code']);
     }
 
-    public function update(BookUnitRequest $request, BookUnit $unit)
+    public function update(BookUnitRequest $request, BookUnit $bookUnit)
     {
         $data = $request->validated();
-        $unit->update($data);
+        $bookUnit->update($data);
         return to_route('book-units.index')->with('success', 'Unit updated successfully');
     }
 
-    public function show(BookUnit $unit)
+    public function show(BookUnit $bookUnit)
     {
         return Inertia::render('books/units/show', [
-            'unit' => $this->transformSingleUnit($unit->load(['book.category'])),
+            'unit' => $this->transformSingleUnit($bookUnit->load(['book.category'])),
         ]);
     }
 
-    public function destroy(BookUnit $unit)
+    public function destroy(BookUnit $bookUnit)
     {
-        $unit->delete();
+        $bookUnit->delete();
         return to_route('book-units.index')->with('success', 'Unit deleted successfully');
     }
 
@@ -70,7 +70,7 @@ class BookUnitController extends Controller implements HasMiddleware
                 })
                 ->when($condition, fn($q) => $q->where('condition', $condition))
                 ->when($status, fn($q) => $q->where('status', $status))
-                ->latest()
+                ->orderBy('code')
                 ->paginate(10)
                 ->withQueryString()
         );
