@@ -15,6 +15,7 @@ export function AppSidebar() {
         { icon: Library, title: 'Library', items: [
             { title: 'Book Categories', href: route('books.categories.index') },
             { title: 'Books', href: route('books.index') },
+            { title: 'Book Units', href: route('book-units.index') },
         ] }
     ] : [
         { icon: LayoutGrid, title: 'Dashboard', href: route('dashboard') },
