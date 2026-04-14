@@ -17,8 +17,8 @@ const navItems = [
     { title: 'Home', href: route('home') },
     { title: 'Books', href: route('books.index') },
     { title: 'Categories', href: route('books.categories.index') },
-    { title: 'Authors', href: '#' },
-    { title: 'Publishers', href: '#' },
+    { title: 'Authors', href: route('books.authors.index') },
+    { title: 'Publishers', href: route('books.publishers.index') },
 ];
 
 interface UserLayoutProps extends PropsWithChildren {
