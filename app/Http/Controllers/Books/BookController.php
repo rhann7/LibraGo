@@ -29,8 +29,8 @@ class BookController extends Controller implements HasMiddleware
         $admin = $user->isAdmin();
 
         return Inertia::render('books/index', [
-            'books'   => $this->getBooks($request->search, $request->category, $request->year),
-            'filters' => $request->only(['search', 'category', 'year']),
+            'books'   => $this->getBooks($request->search, $request->category, $request->author, $request->publisher, $request->year),
+            'filters' => $request->only(['search', 'category', 'author', 'publisher', 'year']),
             'can'     => [
                 'create' => $admin,
                 'edit'   => $admin,
@@ -93,7 +93,7 @@ class BookController extends Controller implements HasMiddleware
         return to_route('books.index')->with('success', 'Book deleted successfully');
     }
 
-    private function getBooks(?string $search = null, ?int $category = null, ?int $year = null)
+    private function getBooks(?string $search = null, ?int $category = null, ?string $author = null, ?string $publisher = null, ?int $year = null)
     {
         return $this->transformBooks(
             Book::query()
@@ -103,6 +103,8 @@ class BookController extends Controller implements HasMiddleware
                     ->orWhere('author', 'like', "%{$search}%")
                     ->orWhere('publisher', 'like', "%{$search}%"))
                 ->when($category, fn($q) => $q->where('book_category_id', $category))
+                ->when($author, fn($q) => $q->where('author', 'like', "%{$author}%"))
+                ->when($publisher, fn($q) => $q->where('publisher', 'like', "%{$publisher}%"))
                 ->when($year, fn($q) => $q->where('year', $year))
                 ->latest()
                 ->paginate(10)
