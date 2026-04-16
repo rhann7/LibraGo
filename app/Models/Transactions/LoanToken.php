@@ -7,14 +7,13 @@ use Illuminate\Support\Str;
 
 class LoanToken extends Model
 {
-    protected $fillable = ['loan_request_id', 'loan_id', 'type', 'token', 'pin', 'expired_at', 'used_at'];
+    protected $fillable = ['loan_request_id', 'loan_id', 'type', 'token', 'expired_at', 'used_at'];
     protected function casts(): array
     {
         return ['expired_at' => 'datetime', 'used_at' => 'datetime'];
     }
 
     public static function generateToken() { return strtoupper(Str::random(8)); }
-    public static function generatePin() { return rand(1000, 9999); }
 
     public function loanRequest() { return $this->belongsTo(LoanRequest::class); }
     public function loan() { return $this->belongsTo(Loan::class); }
