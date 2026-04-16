@@ -11,11 +11,15 @@ return new class extends Migration
         Schema::create('fines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_id')->constrained()->cascadeOnDelete();
-            $table->enum('type', ['late', 'damaged', 'lost']);
+            $table->enum('type', ['late', 'damage', 'lost']);
             $table->unsignedInteger('amount');
+            $table->integer('days_late')->nullable();
             $table->text('note')->nullable();
             $table->enum('status', ['unpaid', 'paid']);
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
+
+            $table->index(['loan_id', 'type', 'status']);
         });
     }
 
