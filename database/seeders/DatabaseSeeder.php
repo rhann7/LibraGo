@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TeacherSeeder::class,
             StudentMasterSeeder::class,
+            BookCategorySeeder::class,
         ]);
     }
 }
