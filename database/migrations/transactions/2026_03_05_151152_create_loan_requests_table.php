@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('book_unit_id')->constrained()->cascadeOnDelete();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'taken'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'taken', 'expired'])->default('pending');
             $table->text('note')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->timestamps();
         });
     }
