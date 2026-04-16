@@ -13,16 +13,17 @@ return new class extends Migration
             $table->foreignId('loan_request_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('loan_id')->nullable()->constrained()->cascadeOnDelete();
             $table->enum('type', ['pickup', 'return']);
-            $table->string('token')->unique();
-            $table->integer('pin')->nullable();
+            $table->string('token', 8)->unique();
             $table->timestamp('expired_at');
             $table->timestamp('used_at')->nullable();
             $table->timestamps();
+
+            $table->index(['loan_request_id', 'loan_id', 'type']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('loan_qr_tokens');
+        Schema::dropIfExists('loan_tokens');
     }
 };
