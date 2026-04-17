@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_request_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('book_unit_id')->constrained()->cascadeOnDelete();
-            $table->enum('status', ['active', 'returned', 'overdue']);
-            $table->timestamp('borrowed_at')->nullable();
-            $table->timestamp('due_date')->nullable();
+            $table->foreignId('loan_token_id')->constrained()->cascadeOnDelete();
+            $table->enum('status', ['active', 'returned'])->default('active');
+            $table->timestamp('borrowed_at');
+            $table->timestamp('due_date');
             $table->timestamp('returned_at')->nullable();
             $table->timestamps();
         });
