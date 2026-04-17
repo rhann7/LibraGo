@@ -11,14 +11,13 @@ return new class extends Migration
         Schema::create('loan_tokens', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_request_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('loan_id')->nullable()->constrained()->cascadeOnDelete();
             $table->enum('type', ['pickup', 'return']);
             $table->string('token', 8)->unique();
             $table->timestamp('expired_at');
             $table->timestamp('used_at')->nullable();
             $table->timestamps();
 
-            $table->index(['loan_request_id', 'loan_id', 'type']);
+            $table->index(['loan_request_id', 'type']);
         });
     }
 
