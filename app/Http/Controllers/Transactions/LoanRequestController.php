@@ -72,6 +72,8 @@ class LoanRequestController extends Controller implements HasMiddleware
 
     public function show(LoanRequest $loanRequest)
     {
+        abort_if(!request()->user()->isAdmin() && $loanRequest->user_id !== request()->user()->id, 403);
+
         $loanRequest->load(['user', 'bookUnit.book']);
         $currentToken = null;
 
