@@ -38,15 +38,14 @@ class LoanController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $request->validate(['token' => ['required', 'string', 'size:8', 'exists:loan_tokens,token']]);
-
+ 
         $loanToken = LoanToken::where('token', $request->token)
             ->where('type', 'pickup')
             ->whereNull('used_at')
             ->where('expired_at', '>', now())
             ->first();
-
+ 
         if (!$loanToken) return back()->withErrors('Token is invalid or has expired.');
-
         $loanRequest = $loanToken->loanRequest;
         if (!$loanRequest->isApproved()) return back()->withErrors('Loan request is not approved.');
  
@@ -60,6 +59,8 @@ class LoanController extends Controller implements HasMiddleware
             ]);
  
             $loanToken->update(['used_at' => now()]);
+            $loanRequest->update(['status' => 'taken']);
+            $loanRequest->bookUnit->update(['status' => 'borrowed']);
         });
  
         return back()->with('success', 'Loan created successfully.');
