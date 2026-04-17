@@ -22,9 +22,10 @@ class BookUnit extends Model
     public function book() { return $this->belongsTo(Book::class); }
     public function logs() { return $this->hasMany(BookUnitLog::class); }
     public function loanRequests() { return $this->hasMany(LoanRequest::class); }
-    public function activeLoan() { return $this->hasOne(Loan::class)->where('status', 'active'); }
+    public function activeLoan() { return $this->hasOneThrough(Loan::class, LoanRequest::class, 'book_unit_id', 'loan_request_id', 'id', 'id')->where('loans.status', 'active'); }
 
     public function scopeAvailable($query) { return $query->where('status', 'available'); }
+    public function scopeReserved($query) { return $query->where('status', 'reserved'); }
     public function scopeBorrowed($query) { return $query->where('status', 'borrowed'); }
     public function scopeLost($query) { return $query->where('status', 'lost'); }
 
