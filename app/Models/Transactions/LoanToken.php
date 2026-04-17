@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class LoanToken extends Model
 {
-    protected $fillable = ['loan_request_id', 'loan_id', 'type', 'token', 'expired_at', 'used_at'];
+    protected $fillable = ['loan_request_id', 'type', 'token', 'expired_at', 'used_at'];
     protected function casts(): array
     {
         return ['expired_at' => 'datetime', 'used_at' => 'datetime'];
@@ -16,7 +16,7 @@ class LoanToken extends Model
     public static function generateToken() { return strtoupper(Str::random(8)); }
 
     public function loanRequest() { return $this->belongsTo(LoanRequest::class); }
-    public function loan() { return $this->belongsTo(Loan::class); }
+    public function loan() { return $this->hasOne(Loan::class);  }
 
     public function scopePickup($query) { return $query->where('type', 'pickup'); }
     public function scopeReturn($query) { return $query->where('type', 'return'); }
