@@ -26,6 +26,7 @@ class User extends Authenticatable
     public function student() { return $this->hasOne(Student::class); }
     public function teacher() { return $this->hasOne(Teacher::class); }
     public function loans() {  return $this->hasManyThrough(Loan::class, LoanRequest::class, 'user_id', 'loan_request_id'); }
+    public function loanRequests() { return $this->hasMany(LoanRequest::class); }
 
     public function scopeStudents($query) { return $query->role('student'); }
     public function scopeTeachers($query) { return $query->role('teacher'); }
