@@ -1,4 +1,4 @@
-import { Link, router } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { BookOpen } from "lucide-react";
 import { route } from "ziggy-js";
 import UserLayout from "@/layouts/user-layout";
@@ -11,6 +11,7 @@ interface Props {
 }
 
 export default function BookShow({ book, bookUnit, activeRequest }: Props) {
+    const { auth } = usePage().props;
     const breadcrumbs = [
         { title: 'Books', href: route('books.index') },
         { title: book.title },
@@ -82,6 +83,11 @@ export default function BookShow({ book, bookUnit, activeRequest }: Props) {
                                 <BookOpen className="h-4 w-4" />
                                 View Request
                             </Link>
+                        ) : auth.has_overdue_loan ? (
+                            <button disabled className="inline-flex items-center gap-2 rounded-sm bg-foreground px-8 py-2.5 text-sm font-medium text-background opacity-50 cursor-not-allowed">
+                                <BookOpen className="h-4 w-4" />
+                                You have an overdue loan
+                            </button>
                         ) : (
                             <button disabled={!bookUnit} onClick={() => { if (!bookUnit) return; if (!confirm(`Borrow "${book.title}"?`)) return; router.post(route('loan-requests.store'), { book_unit_id: bookUnit.id }, { preserveScroll: true }); }} className={`inline-flex items-center gap-2 rounded-sm bg-foreground px-8 py-2.5 text-sm font-medium text-background ${!bookUnit ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-90'}`}>
                                 <BookOpen className="h-4 w-4" />
