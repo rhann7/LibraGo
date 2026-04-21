@@ -57,6 +57,7 @@ export default function LoanIndex({ loans, filters, can }: Props) {
                 <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="overdue">Overdue</SelectItem>
                     <SelectItem value="returned">Returned</SelectItem>
                 </SelectContent>
             </Select>

@@ -56,10 +56,8 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                         </div>
                         <div className="grid grid-cols-[140px_1fr] text-sm">
                             <span className="text-muted-foreground">Status</span>
-                            <Badge className="w-fit" variant={
-                                loan.status === 'active' ? 'default' : 'secondary'
-                            }>
-                                {loan.is_overdue ? 'overdue' : loan.status}
+                            <Badge className="w-fit" variant={loan.status === 'overdue' ? 'destructive' : loan.status === 'active' ? 'default' : 'secondary'}>
+                                {loan.status}
                             </Badge>
                         </div>
                         <div className="grid grid-cols-[140px_1fr] text-sm">
@@ -79,10 +77,14 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                                 <span>{new Date(loan.returned_at).toLocaleDateString('id-ID')}</span>
                             </div>
                         )}
+                        <div className="grid grid-cols-[140px_1fr] text-sm">
+                            <span className="text-muted-foreground">Late Days</span>
+                            <span>{loan.late_days}</span>
+                        </div>
                     </div>
                 </div>
 
-                {can.return && loan.status === 'active' && (
+                {can.return && (loan.status === 'active' || loan.status === 'overdue') && (
                     <div className="rounded-md border border-border bg-card p-6 space-y-4">
                         <p className="text-sm font-medium">Process Return</p>
                         <form onSubmit={(e) => { e.preventDefault(); router.patch(route('loans.return', { loan: loan.id }), { token }, { preserveScroll: true, onSuccess: () => setToken('') }); }} className="space-y-3">
