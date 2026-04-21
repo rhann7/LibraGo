@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Transactions;
 
 use App\Http\Controllers\Controller;
+use App\Models\Transactions\Fine;
 use App\Models\Transactions\Loan;
 use App\Models\Transactions\LoanToken;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class LoanController extends Controller implements HasMiddleware
@@ -70,10 +72,10 @@ class LoanController extends Controller implements HasMiddleware
     {
         abort_if(!request()->user()->isAdmin() && $loan->loanRequest->user_id !== request()->user()->id, 403);
 
-        $loan->load(['loanRequest.user', 'loanRequest.bookUnit.book']);
+        $loan->load(['loanRequest.user', 'loanRequest.bookUnit.book', 'fine']);
         $currentToken = null;
 
-        if ($loan->isActive() && !request()->user()->isAdmin()) $currentToken = $this->ensureReturnToken($loan);
+        if (($loan->isActive() || $loan->isOverdue()) && !request()->user()->isAdmin()) $currentToken = $this->ensureReturnToken($loan);
 
         return Inertia::render('transactions/loans/show', [
             'loan'           => $this->transformSingleLoan($loan),
@@ -90,7 +92,9 @@ class LoanController extends Controller implements HasMiddleware
     {
         $request->validate(['token' => ['required', 'string', 'size:8', 'exists:loan_tokens,token']]);
 
-        if (!$loan->isActive()) return back()->withErrors('Loan is not active.');
+        if (!$loan->isActive() && !$loan->isOverdue()) {
+            return back()->withErrors('Loan is not active.');
+        }
 
         $loanToken = LoanToken::where('token', $request->token)
             ->where('type', 'return')
@@ -99,17 +103,30 @@ class LoanController extends Controller implements HasMiddleware
             ->first();
 
         if (!$loanToken) return back()->withErrors('Token is invalid or has expired.');
- 
+
         DB::transaction(function () use ($loan, $loanToken) {
+            $isOverdue = $loan->isOverdue();
+            $lateDays = $isOverdue ? (int) abs(now()->diffInDays($loan->due_date)) : 0;
+
             $loan->update([
                 'status'      => 'returned',
                 'returned_at' => now(),
             ]);
- 
+
             $loanToken->update(['used_at' => now()]);
             $loan->loanRequest->bookUnit->update(['status' => 'available']);
+
+            if ($isOverdue && $lateDays > 0) {
+                Fine::create([
+                    'loan_id'   => $loan->id,
+                    'user_id'   => $loan->loanRequest->user_id,
+                    'late_days' => $lateDays,
+                    'amount'    => $lateDays * 2000,
+                    'status'    => 'unpaid',
+                ]);
+            }
         });
- 
+
         return back()->with('success', 'Loan returned successfully.');
     }
 
@@ -190,7 +207,7 @@ class LoanController extends Controller implements HasMiddleware
             'due_date'    => $loan->due_date,
             'returned_at' => $loan->returned_at,
             'is_overdue'  => $loan->isOverdue(),
-            'late_days'   => $loan->lateDays(),
+            'late_days'   => $loan->fine ? $loan->fine->late_days : 0,
             'user'        => [
                 'id'   => $loan->loanRequest->user->id,
                 'name' => $loan->loanRequest->user->name,
