@@ -16,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface AdminStats {
     users: { total: number; students: number; teachers: number };
     books: { total: number; units: number };
-    loans: { total: number; pending: number; active: number; returned: number; overdue: number };
+    loans: { total: number; active: number; returned: number; overdue: number };
 }
 
 interface UserStats {
@@ -82,7 +82,7 @@ export default function Dashboard({ stats, activity }: Props) {
                                     <BookMarked className="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <p className="text-3xl font-bold">{stats.loans.total}</p>
-                                <p className="text-xs text-muted-foreground">{stats.loans.active} active, {stats.loans.pending} pending, {stats.loans.overdue} overdue.</p>
+                                <p className="text-xs text-muted-foreground">{stats.loans.active} active, {stats.loans.overdue} overdue.</p>
                             </div>
                         </>
                     ) : (
@@ -168,7 +168,6 @@ export default function Dashboard({ stats, activity }: Props) {
                                             <PieChart>
                                                 <Pie
                                                     data={[
-                                                        { name: 'Pending', value: stats.loans.pending },
                                                         { name: 'Active', value: stats.loans.active },
                                                         { name: 'Returned', value: stats.loans.returned },
                                                         { name: 'Overdue', value: stats.loans.overdue },
