@@ -13,4 +13,6 @@ export type User = {
 export type Auth = {
     user: User;
     roles: string[];
+    has_overdue_loan: boolean;
+    has_unpaid_fine: boolean;
 };

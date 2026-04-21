@@ -20,7 +20,7 @@ export type LoanRequest = {
 
 export type Loan = {
     id: number;
-    status: 'active' | 'returned';
+    status: 'active'| 'overdue' | 'returned';
     borrowed_at: string;
     due_date: string;
     returned_at: string | null;
