@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Transactions\LoanController;
 use App\Http\Controllers\Transactions\LoanRequestController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,4 +13,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::patch('loan-requests/{loanRequest}/reject', [LoanRequestController::class, 'reject'])
         ->name('loan-requests.reject');
+
+    Route::get('loans/validate-token', [LoanController::class, 'validateToken'])->name('loans.validate-token');
+
+    Route::resource('loans', LoanController::class)
+        ->only(['index', 'show']);
+
+    Route::patch('loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
+
+    Route::post('loans', [LoanController::class, 'store'])->name('loans.store');
 });
