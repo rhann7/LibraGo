@@ -14,7 +14,6 @@ class Loan extends Model
 
     public function loanRequest() { return $this->belongsTo(LoanRequest::class); }
     public function token() { return $this->belongsTo(LoanToken::class, 'loan_token_id'); }
-    public function fines() { return $this->hasMany(Fine::class); }
 
     public function scopeActive($query) { return $query->where('status', 'active'); }
     public function scopeReturned($query) { return $query->where('status', 'returned'); }

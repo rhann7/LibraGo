@@ -20,7 +20,6 @@ class BookUnit extends Model
     }
 
     public function book() { return $this->belongsTo(Book::class); }
-    public function logs() { return $this->hasMany(BookUnitLog::class); }
     public function loanRequests() { return $this->hasMany(LoanRequest::class); }
 
     public function scopeAvailable($query) { return $query->where('status', 'available'); }

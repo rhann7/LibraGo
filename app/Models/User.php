@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Models\Identiies\Student;
 use App\Models\Identiies\Teacher;
+use App\Models\Transactions\Loan;
+use App\Models\Transactions\LoanRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,6 +25,7 @@ class User extends Authenticatable
 
     public function student() { return $this->hasOne(Student::class); }
     public function teacher() { return $this->hasOne(Teacher::class); }
+    public function loans() {  return $this->hasManyThrough(Loan::class, LoanRequest::class, 'user_id', 'loan_request_id'); }
 
     public function scopeStudents($query) { return $query->role('student'); }
     public function scopeTeachers($query) { return $query->role('teacher'); }
