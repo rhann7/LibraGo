@@ -10,6 +10,7 @@ use App\Models\Books\BookUnit;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -82,10 +83,18 @@ class BookController extends Controller implements HasMiddleware
     public function show(Book $book)
     {
         $bookUnit = $book->units()->where('status', 'available')->first();
+        $user = Auth::user();
+
+        $activeRequest = $user->loanRequests()
+            ->whereHas('bookUnit', fn($q) => $q->where('book_id', $book->id))
+            ->whereIn('status', ['pending', 'approved'])
+            ->latest()
+            ->first();
 
         return Inertia::render('books/show', [
-            'book'      => $this->transformSingleBook($book->load('category')->loadCount('units')),
-            'bookUnit'  => $bookUnit ? ['id' => $bookUnit->id] : null,
+            'book'          => $this->transformSingleBook($book->load('category')->loadCount('units')),
+            'bookUnit'      => $bookUnit ? ['id' => $bookUnit->id] : null,
+            'activeRequest' => $activeRequest ? ['id' => $activeRequest->id, 'status' => $activeRequest->status] : null,
         ]);
     }
 
