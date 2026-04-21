@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Library } from 'lucide-react';
+import { ChartBar, LayoutGrid, Library, UsersRound } from 'lucide-react';
 import { route } from 'ziggy-js';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -12,13 +12,25 @@ export function AppSidebar() {
 
     const navGroups = admin ? [
         { icon: LayoutGrid, title: 'Dashboard', href: route('dashboard') },
-        { icon: Library, title: 'Library', items: [
+        { icon: UsersRound, title: 'Users', items: [
+            { title: 'Students', href: route('students.index') },
+            { title: 'Teachers', href: route('teachers.index') },
+        ] },
+        { icon: Library, title: 'Libraries', items: [
             { title: 'Book Categories', href: route('books.categories.index') },
             { title: 'Books', href: route('books.index') },
             { title: 'Book Units', href: route('book-units.index') },
-        ] }
+        ] },
+        { icon: ChartBar, title: 'Transactions', items: [
+            { title: 'Loan Requests', href: route('loan-requests.index') },
+            { title: 'Loans', href: route('loans.index') },
+        ] },
     ] : [
         { icon: LayoutGrid, title: 'Dashboard', href: route('dashboard') },
+        { icon: ChartBar, title: 'Transactions', items: [
+            { title: 'Loan Requests', href: route('loan-requests.index') },
+            { title: 'Loans', href: route('loans.index') },
+        ] },
     ];
 
     return (
