@@ -80,7 +80,7 @@ class LoanRequestController extends Controller implements HasMiddleware
         if ($loanRequest->isApproved()) $currentToken = $this->ensurePickupToken($loanRequest);
 
         return Inertia::render('transactions/loans/requests/show', [
-            'request'        => $this->transformSingleLoan($loanRequest),
+            'request'        => $this->transformSingleLoanRequest($loanRequest),
             'currentToken'   => $currentToken ? [
                 'token'      => $currentToken->token,
                 'expired_at' => $currentToken->expired_at,
@@ -128,7 +128,7 @@ class LoanRequestController extends Controller implements HasMiddleware
         );
     }
 
-    private function transformSingleLoan(LoanRequest $loanRequest)
+    private function transformSingleLoanRequest(LoanRequest $loanRequest)
     {
         return [
             'id'         => $loanRequest->id,
@@ -153,7 +153,7 @@ class LoanRequestController extends Controller implements HasMiddleware
 
     private function transformLoans($pagination)
     {
-        $pagination->getCollection()->transform(fn($lr) => $this->transformSingleLoan($lr));
+        $pagination->getCollection()->transform(fn($lr) => $this->transformSingleLoanRequest($lr));
         return $pagination;
     }
 }

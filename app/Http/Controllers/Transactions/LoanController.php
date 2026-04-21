@@ -73,15 +73,16 @@ class LoanController extends Controller implements HasMiddleware
         $loan->load(['loanRequest.user', 'loanRequest.bookUnit.book']);
         $currentToken = null;
 
-        if ($loan->isActive()) $currentToken = $this->ensureReturnToken($loan);
+        if ($loan->isActive() && !request()->user()->isAdmin()) $currentToken = $this->ensureReturnToken($loan);
 
         return Inertia::render('transactions/loans/show', [
-            'loan'         => $this->transformSingleLoan($loan),
-            'currentToken' => $currentToken ? [
+            'loan'           => $this->transformSingleLoan($loan),
+            'currentToken'   => $currentToken ? [
                 'token'      => $currentToken->token,
                 'expired_at' => $currentToken->expired_at,
                 'expires_in' => now()->diffInSeconds($currentToken->expired_at, false),
             ] : null,
+            'can'            => ['return' => request()->user()->isAdmin()],
         ]);
     }
 
@@ -110,6 +111,35 @@ class LoanController extends Controller implements HasMiddleware
         });
  
         return back()->with('success', 'Loan returned successfully.');
+    }
+
+    public function validateToken(Request $request)
+    {
+        $request->validate(['token' => ['required', 'string', 'size:8']]);
+
+        $loanToken = LoanToken::where('token', $request->token)
+            ->where('type', 'pickup')
+            ->whereNull('used_at')
+            ->where('expired_at', '>', now())
+            ->first();
+
+        if (!$loanToken) return response()->json(['message' => 'Token is invalid or has expired.'], 422);
+
+        $loanRequest = $loanToken->loanRequest->load(['user', 'bookUnit.book']);
+        if (!$loanRequest->isApproved()) return response()->json(['message' => 'Loan request is not approved.'], 422);
+
+        return response()->json([
+            'id'        => $loanRequest->id,
+            'user'      => ['id' => $loanRequest->user->id, 'name' => $loanRequest->user->name],
+            'book_unit' => [
+                'id'   => $loanRequest->bookUnit->id,
+                'code' => $loanRequest->bookUnit->code,
+                'book' => [
+                    'title'     => $loanRequest->bookUnit->book->title,
+                    'cover_url' => $loanRequest->bookUnit->book->cover_url,
+                ],
+            ],
+        ]);
     }
  
     private function ensureReturnToken(Loan $loan)
