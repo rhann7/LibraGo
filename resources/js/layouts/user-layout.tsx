@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
-import { ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronRight } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 import { route } from 'ziggy-js';
 import AppLogoIcon from '@/components/app-logo-icon';
@@ -38,6 +38,21 @@ export default function UserLayout({ children, title, breadcrumbs }: UserLayoutP
 
             <div className="flex min-h-screen flex-col bg-background">
                 <header className="sticky top-0 z-40 border-b border-border bg-background">
+                    {auth.has_overdue_loan && (
+                        <div className="bg-destructive/10 border-b border-destructive/20 px-4 py-3">
+                            <div className="mx-auto max-w-7xl flex items-center gap-3">
+                                <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
+                                <p className="text-sm text-destructive font-medium">
+                                    You have an overdue loan. Please return the book immediately to avoid further fines. Visit{' '}
+                                    <Link href={route('loans.index')} className="underline underline-offset-4">
+                                        My Loans
+                                    </Link>{' '}
+                                    for details.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
                         <Link href={route('dashboard')} className="flex items-center gap-2 font-semibold">
                             <AppLogoIcon className="size-6 fill-current" />
