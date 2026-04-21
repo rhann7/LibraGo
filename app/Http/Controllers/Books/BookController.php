@@ -81,8 +81,11 @@ class BookController extends Controller implements HasMiddleware
 
     public function show(Book $book)
     {
+        $bookUnit = $book->units()->where('status', 'available')->first();
+
         return Inertia::render('books/show', [
-            'book' => $this->transformSingleBook($book),
+            'book'      => $this->transformSingleBook($book->load('category')->loadCount('units')),
+            'bookUnit'  => $bookUnit ? ['id' => $bookUnit->id] : null,
         ]);
     }
 

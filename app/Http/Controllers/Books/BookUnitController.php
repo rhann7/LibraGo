@@ -23,8 +23,8 @@ class BookUnitController extends Controller implements HasMiddleware
     public function index(Request $request)
     {
         return Inertia::render('books/units/index', [
-            'units'   => $this->getUnits($request->search, $request->condition, $request->status),
-            'filters' => $request->only(['search', 'condition', 'status']),
+            'units'   => $this->getUnits($request->search, $request->id, $request->condition, $request->status),
+            'filters' => $request->only(['search', 'id', 'condition', 'status']),
             'books'   => Book::orderBy('title')->get(['id', 'title']),
         ]);
     }
@@ -57,7 +57,7 @@ class BookUnitController extends Controller implements HasMiddleware
         return to_route('book-units.index')->with('success', 'Unit deleted successfully');
     }
 
-    private function getUnits(?string $search = null, ?string $condition = null, ?string $status = null)
+    private function getUnits(?string $search = null, ?int $id = null, ?string $condition = null, ?string $status = null)
     {
         return $this->transformUnits(
             BookUnit::query()
@@ -68,6 +68,7 @@ class BookUnitController extends Controller implements HasMiddleware
                           ->orWhereHas('book', fn($q) => $q->where('title', 'like', "%$search%"));
                     });
                 })
+                ->when($id, fn($q) => $q->where('id', $id))
                 ->when($condition, fn($q) => $q->where('condition', $condition))
                 ->when($status, fn($q) => $q->where('status', $status))
                 ->orderBy('code')
