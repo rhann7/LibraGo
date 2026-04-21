@@ -43,7 +43,6 @@ class DashboardController extends Controller implements HasMiddleware
             ],
             'loans' => [
                 'total'    => Loan::count(),
-                'pending'  => Loan::pending()->count(),
                 'active'   => Loan::active()->count(),
                 'returned' => Loan::returned()->count(),
                 'overdue'  => Loan::active()->where('due_date', '<', now())->count(),
