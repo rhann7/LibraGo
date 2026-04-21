@@ -1,3 +1,4 @@
+import { router } from "@inertiajs/react";
 import { BookOpen } from "lucide-react";
 import { route } from "ziggy-js";
 import UserLayout from "@/layouts/user-layout";
@@ -5,9 +6,10 @@ import type { Book } from "@/types";
 
 interface Props {
     book: Book;
+    bookUnit: { id: number } | null;
 }
 
-export default function BookShow({ book }: Props) {
+export default function BookShow({ book, bookUnit }: Props) {
     const breadcrumbs = [
         { title: 'Books', href: route('books.index') },
         { title: book.title },
@@ -65,18 +67,18 @@ export default function BookShow({ book }: Props) {
                         )}
                         <div className="grid grid-cols-[160px_1fr] text-sm">
                             <span className="text-muted-foreground">Pages</span>
-                            <span>{book.pages}p.</span>
+                            <span>{book.pages} pages</span>
                         </div>
                         <div className="grid grid-cols-[160px_1fr] text-sm">
                             <span className="text-muted-foreground">Available Units</span>
-                            <span>{book.units_count} tersedia</span>
+                            <span>{book.units_count} units</span>
                         </div>
                     </div>
 
                     <div className="border-t border-border pt-6">
-                        <button disabled className="inline-flex items-center gap-2 rounded-sm bg-foreground px-8 py-2.5 text-sm font-medium text-background opacity-50 cursor-not-allowed">
+                        <button disabled={!bookUnit} onClick={() => { if (!bookUnit) return; if (!confirm(`Borrow "${book.title}"?`)) return; router.post(route('loan-requests.store'), { book_unit_id: bookUnit.id }, { preserveScroll: true }); }} className={`inline-flex items-center gap-2 rounded-sm bg-foreground px-8 py-2.5 text-sm font-medium text-background ${!bookUnit ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-90'}`}>
                             <BookOpen className="h-4 w-4" />
-                            Pinjam Buku
+                            Borrow Book
                         </button>
                     </div>
                 </div>
