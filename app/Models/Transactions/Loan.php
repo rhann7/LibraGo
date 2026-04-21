@@ -15,9 +15,11 @@ class Loan extends Model
     public function loanRequest() { return $this->belongsTo(LoanRequest::class); }
     public function token() { return $this->belongsTo(LoanToken::class, 'loan_token_id'); }
 
+    public function scopePending($query) { return $query->where('status', 'pending'); }
     public function scopeActive($query) { return $query->where('status', 'active'); }
     public function scopeReturned($query) { return $query->where('status', 'returned'); }
 
+    public function isPending(): bool { return $this->status === 'pending'; }
     public function isActive(): bool { return $this->status === 'active'; }
     public function isReturned(): bool { return $this->status === 'returned'; }
     public function isOverdue(): bool {  return $this->status === 'active' && now()->isAfter($this->due_date);  }
