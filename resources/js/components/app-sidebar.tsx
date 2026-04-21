@@ -24,12 +24,14 @@ export function AppSidebar() {
         { icon: ChartBar, title: 'Transactions', items: [
             { title: 'Loan Requests', href: route('loan-requests.index') },
             { title: 'Loans', href: route('loans.index') },
+            { title: 'Fines', href: route('fines.index') },
         ] },
     ] : [
         { icon: LayoutGrid, title: 'Dashboard', href: route('dashboard') },
         { icon: ChartBar, title: 'Transactions', items: [
             { title: 'Loan Requests', href: route('loan-requests.index') },
             { title: 'Loans', href: route('loans.index') },
+            { title: 'Fines', href: route('fines.index') },
         ] },
     ];
 
