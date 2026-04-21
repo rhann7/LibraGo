@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('loan_request_id')->constrained()->cascadeOnDelete();
             $table->foreignId('loan_token_id')->constrained()->cascadeOnDelete();
-            $table->enum('status', ['active', 'returned'])->default('active');
+            $table->enum('status', ['active', 'overdue', 'returned'])->default('active');
             $table->timestamp('borrowed_at')->nullable();
             $table->timestamp('due_date')->nullable();
             $table->timestamp('returned_at')->nullable();
