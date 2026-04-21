@@ -14,14 +14,15 @@ class Loan extends Model
 
     public function loanRequest() { return $this->belongsTo(LoanRequest::class); }
     public function token() { return $this->belongsTo(LoanToken::class, 'loan_token_id'); }
+    public function fine() { return $this->hasOne(Fine::class); }
 
-    public function scopePending($query) { return $query->where('status', 'pending'); }
     public function scopeActive($query) { return $query->where('status', 'active'); }
+    public function scopeOverdue($query) { return $query->where('status', 'overdue'); }
     public function scopeReturned($query) { return $query->where('status', 'returned'); }
 
-    public function isPending(): bool { return $this->status === 'pending'; }
     public function isActive(): bool { return $this->status === 'active'; }
+    public function isOverdue(): bool { return $this->status === 'overdue'; }
     public function isReturned(): bool { return $this->status === 'returned'; }
-    public function isOverdue(): bool {  return $this->status === 'active' && now()->isAfter($this->due_date);  }
-    public function lateDays(): int { return $this->isOverdue() ? (int) now()->diffInDays($this->due_date) : 0; }
+
+    public function fineAmount(): int { return $this->lateDays() * 2000; }
 }

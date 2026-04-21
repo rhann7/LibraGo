@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Identiies\Student;
 use App\Models\Identiies\Teacher;
+use App\Models\Transactions\Fine;
 use App\Models\Transactions\Loan;
 use App\Models\Transactions\LoanRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +28,7 @@ class User extends Authenticatable
     public function teacher() { return $this->hasOne(Teacher::class); }
     public function loans() {  return $this->hasManyThrough(Loan::class, LoanRequest::class, 'user_id', 'loan_request_id'); }
     public function loanRequests() { return $this->hasMany(LoanRequest::class); }
+    public function fines() { return $this->hasMany(Fine::class); }
 
     public function scopeStudents($query) { return $query->role('student'); }
     public function scopeTeachers($query) { return $query->role('teacher'); }
@@ -36,4 +38,5 @@ class User extends Authenticatable
     public function isTeacher() { return $this->hasRole('teacher'); }
 
     public function getAvatarUrlAttribute(): ?string { $profile = $this->student ?? $this->teacher; return $profile?->avatar_url; }
+    public function hasOverdueLoan(): bool { return $this->loans()->where('loans.status', 'overdue')->exists(); }
 }
