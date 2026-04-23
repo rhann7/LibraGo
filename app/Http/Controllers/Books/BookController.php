@@ -30,13 +30,9 @@ class BookController extends Controller implements HasMiddleware
         $admin = $user->isAdmin();
 
         return Inertia::render('books/index', [
-            'books'   => $this->getBooks($request->search, $request->category, $request->author, $request->publisher, $request->year),
-            'filters' => $request->only(['search', 'category', 'author', 'publisher', 'year']),
-            'can'     => [
-                'create' => $admin,
-                'edit'   => $admin,
-                'delete' => $admin,
-            ],
+            'books'   => $this->getBooks($request->search, $request->category, $request->year, $request->pages_min, $request->pages_max),
+            'filters' => $request->only(['search', 'category', 'year']),
+            'can'     => ['create' => $admin, 'edit' => $admin, 'delete' => $admin],
             'categories' => BookCategory::orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -105,19 +101,17 @@ class BookController extends Controller implements HasMiddleware
         return to_route('books.index')->with('success', 'Book deleted successfully');
     }
 
-    private function getBooks(?string $search = null, ?int $category = null, ?string $author = null, ?string $publisher = null, ?int $year = null)
+    private function getBooks(?string $search = null, ?int $category = null, ?int $year = null, ?int $pagesMin = null, ?int $pagesMax = null)
     {
         return $this->transformBooks(
             Book::query()
                 ->with('category')
                 ->withCount('units')
-                ->when($search, fn($q) => $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('author', 'like', "%{$search}%")
-                    ->orWhere('publisher', 'like', "%{$search}%"))
+                ->when($search, fn($q) => $q->where('title', 'like', "%{$search}%")->orWhere('author', 'like', "%{$search}%")->orWhere('publisher', 'like', "%{$search}%"))
                 ->when($category, fn($q) => $q->where('book_category_id', $category))
-                ->when($author, fn($q) => $q->where('author', 'like', "%{$author}%"))
-                ->when($publisher, fn($q) => $q->where('publisher', 'like', "%{$publisher}%"))
                 ->when($year, fn($q) => $q->where('year', $year))
+                ->when($pagesMin, fn($q) => $q->where('pages', '>=', $pagesMin))
+                ->when($pagesMax, fn($q) => $q->where('pages', '<=', $pagesMax))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString()
