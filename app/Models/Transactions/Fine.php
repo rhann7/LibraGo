@@ -7,16 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Fine extends Model
 {
-    protected $fillable = ['loan_id', 'user_id', 'late_days', 'amount', 'status', 'paid_at'];
+    protected $fillable = ['loan_id', 'user_id', 'type', 'late_days', 'amount', 'status', 'paid_at'];
 
     protected function casts(): array
     {
         return ['paid_at' => 'datetime'];
-    }
-
-    public function getFormattedAmountAttribute(): string
-    {
-        return 'Rp ' . number_format($this->amount, 0, ',', '.');
     }
 
     public function loan() { return $this->belongsTo(Loan::class); }
@@ -26,4 +21,12 @@ class Fine extends Model
     public function scopePaid($query) { return $query->where('status', 'paid'); }
 
     public function isPaid(): bool { return $this->status === 'paid'; }
+    public function isLate(): bool { return $this->type === 'late'; }
+    public function isDamaged(): bool { return $this->type === 'damaged'; }
+    public function isLost(): bool { return $this->type === 'lost'; }
+
+    public function getFormattedAmountAttribute(): string
+    {
+        return 'Rp ' . number_format($this->amount, 0, ',', '.');
+    }
 }
