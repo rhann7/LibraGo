@@ -72,9 +72,9 @@ class LoanController extends Controller implements HasMiddleware
     {
         abort_if(!request()->user()->isAdmin() && $loan->loanRequest->user_id !== request()->user()->id, 403);
 
-        $loan->load(['loanRequest.user', 'loanRequest.bookUnit.book', 'fine']);
-        $currentToken = null;
+        $loan->load(['loanRequest.user', 'loanRequest.bookUnit.book', 'fines']);
 
+        $currentToken = null;
         if (($loan->isActive() || $loan->isOverdue()) && !request()->user()->isAdmin()) $currentToken = $this->ensureReturnToken($loan);
 
         return Inertia::render('transactions/loans/show', [
@@ -106,7 +106,7 @@ class LoanController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($loan, $loanToken) {
             $isOverdue = $loan->isOverdue();
-            $lateDays = $isOverdue ? (int) abs(now()->diffInDays($loan->due_date)) : 0;
+            $lateDays  = $isOverdue ? (int) abs(now()->diffInDays($loan->due_date)) : 0;
 
             $loan->update([
                 'status'      => 'returned',
@@ -120,6 +120,7 @@ class LoanController extends Controller implements HasMiddleware
                 Fine::create([
                     'loan_id'   => $loan->id,
                     'user_id'   => $loan->loanRequest->user_id,
+                    'type'      => 'late',
                     'late_days' => $lateDays,
                     'amount'    => $lateDays * 2000,
                     'status'    => 'unpaid',
@@ -128,6 +129,47 @@ class LoanController extends Controller implements HasMiddleware
         });
 
         return back()->with('success', 'Loan returned successfully.');
+    }
+
+    public function addFine(Request $request, Loan $loan)
+    {
+        $request->validate([
+            'damaged'           => ['boolean'],
+            'lost'              => ['boolean'],
+            'damage_percentage' => ['required_if:damaged,true', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        if (!$loan->isReturned()) return back()->withErrors('Loan is not returned yet.');
+
+        $bookPrice = $loan->loanRequest->bookUnit->book->price ?? 0;
+
+        DB::transaction(function () use ($request, $loan, $bookPrice) {
+            if ($request->damaged) {
+                Fine::create([
+                    'loan_id' => $loan->id,
+                    'user_id' => $loan->loanRequest->user_id,
+                    'type'    => 'damaged',
+                    'amount'  => (int) ($bookPrice * $request->damage_percentage / 100),
+                    'status'  => 'unpaid',
+                ]);
+
+                if ($request->damage_percentage > 50) $loan->loanRequest->bookUnit->update(['condition' => 'damaged']);
+            }
+
+            if ($request->lost) {
+                Fine::create([
+                    'loan_id' => $loan->id,
+                    'user_id' => $loan->loanRequest->user_id,
+                    'type'    => 'lost',
+                    'amount'  => $bookPrice,
+                    'status'  => 'unpaid',
+                ]);
+
+                $loan->loanRequest->bookUnit->update(['status' => 'lost']);
+            }
+        });
+
+        return back()->with('success', 'Fines added successfully.');
     }
 
     public function validateToken(Request $request)
@@ -200,25 +242,28 @@ class LoanController extends Controller implements HasMiddleware
  
     private function transformSingleLoan(Loan $loan)
     {
+        $lateFine = $loan->fines->where('type', 'late')->first();
+
         return [
-            'id'          => $loan->id,
-            'status'      => $loan->status,
-            'borrowed_at' => $loan->borrowed_at,
-            'due_date'    => $loan->due_date,
-            'returned_at' => $loan->returned_at,
-            'is_overdue'  => $loan->isOverdue(),
-            'late_days'   => $loan->fine ? $loan->fine->late_days : 0,
-            'user'        => [
-                'id'   => $loan->loanRequest->user->id,
-                'name' => $loan->loanRequest->user->name,
+            'id'                => $loan->id,
+            'status'            => $loan->status,
+            'borrowed_at'       => $loan->borrowed_at,
+            'due_date'          => $loan->due_date,
+            'returned_at'       => $loan->returned_at,
+            'is_overdue'        => $loan->isOverdue(),
+            'late_days'         => $lateFine?->late_days ?? 0,
+            'user'              => [
+                'id'            => $loan->loanRequest->user->id,
+                'name'          => $loan->loanRequest->user->name,
             ],
-            'book_unit'   => [
-                'id'   => $loan->loanRequest->bookUnit->id,
-                'code' => $loan->loanRequest->bookUnit->code,
-                'book' => [
+            'book_unit'         => [
+                'id'            => $loan->loanRequest->bookUnit->id,
+                'code'          => $loan->loanRequest->bookUnit->code,
+                'book'          => [
                     'id'        => $loan->loanRequest->bookUnit->book->id,
                     'title'     => $loan->loanRequest->bookUnit->book->title,
                     'cover_url' => $loan->loanRequest->bookUnit->book->cover_url,
+                    'price'     => $loan->loanRequest->bookUnit->book->price,
                 ],
             ],
         ];
