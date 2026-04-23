@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('loans/validate-token', [LoanController::class, 'validateToken'])->name('loans.validate-token');
     Route::resource('loans', LoanController::class)->only(['index', 'show']);
     Route::patch('loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
+    Route::post('loans/{loan}/add-fine', [LoanController::class, 'addFine'])->name('loans.add-fine');
     Route::post('loans', [LoanController::class, 'store'])->name('loans.store');
 
     Route::get('fines', [FineController::class, 'index'])->name('fines.index');
