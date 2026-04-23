@@ -37,6 +37,9 @@ class BookSeeder extends Seeder
                 'book_category_id' => $categories[array_rand($categories)],
                 'slug'             => Str::slug($book['title']),
                 'isbn'             => $isbn,
+                'synopsis'         => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit voluptates aliquam eum nulla? 
+                                       Nostrum quia veniam aut explicabo iusto placeat accusantium unde eos pariatur. 
+                                       Deleniti deserunt sequi ad omnis odit aliquam, quaerat officiis temporibus eos tenetur voluptatem, vero soluta debitis?',
             ]);
 
             $units = [];
