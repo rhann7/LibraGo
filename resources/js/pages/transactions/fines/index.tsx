@@ -19,7 +19,8 @@ interface Fine {
     id: number;
     user: { id: number; name: string };
     book: { title: string; cover_url: string | null };
-    late_days: number;
+    type: 'late' | 'damaged' | 'lost';
+    late_days: number | null;
     amount: number;
     formatted_amount: string;
     status: 'unpaid' | 'paid';
@@ -35,7 +36,7 @@ interface Props {
         to: number | null;
         total: number;
     };
-    filters: { search?: string; status?: string };
+    filters: { search?: string; status?: string; type?: string };
     can: { update: boolean };
 }
 
@@ -56,10 +57,17 @@ export default function FineIndex({ fines, filters, can }: Props) {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input defaultValue={filters.search ?? ''} onInput={handleSearch} placeholder="Search fines..." className="pl-9 w-64" />
             </div>
+            <Select value={filters.type ?? 'all'} onValueChange={(val) => router.get(route('fines.index'), { ...filters, type: val === 'all' ? undefined : val }, { preserveState: true, replace: true })}>
+                <SelectTrigger className="w-36"><SelectValue placeholder="All Types" /></SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="late">Late</SelectItem>
+                    <SelectItem value="damaged">Damaged</SelectItem>
+                    <SelectItem value="lost">Lost</SelectItem>
+                </SelectContent>
+            </Select>
             <Select value={filters.status ?? 'all'} onValueChange={(val) => router.get(route('fines.index'), { ...filters, status: val === 'all' ? undefined : val }, { preserveState: true, replace: true })}>
-                <SelectTrigger className="w-40">
-                    <SelectValue placeholder="All Statuses" />
-                </SelectTrigger>
+                <SelectTrigger className="w-40"><SelectValue placeholder="All Statuses" /></SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="unpaid">Unpaid</SelectItem>
@@ -72,7 +80,7 @@ export default function FineIndex({ fines, filters, can }: Props) {
     return (
         <DataTableLayout
             title="Fines"
-            description="Manage late return fines"
+            description="Manage fines"
             breadcrumbs={breadcrumbs}
             filterWidget={filterWidget}
             pagination={fines}
@@ -84,26 +92,21 @@ export default function FineIndex({ fines, filters, can }: Props) {
                 <thead className="border-b border-border/50 bg-muted/30">
                     <tr>
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground">No</th>
-                        {can.update && (
-                            <th className="px-6 py-3 text-left font-medium text-muted-foreground">User</th>
-                        )}
+                        {can.update && <th className="px-6 py-3 text-left font-medium text-muted-foreground">User</th>}
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground">Book</th>
-                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">Late Days</th>
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">Type</th>
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Late Days</th>
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground">Amount</th>
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground">Status</th>
-                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">Created At</th>
-                        {can.update && (
-                            <th className="px-6 py-3 text-right font-medium text-muted-foreground">Actions</th>
-                        )}
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Created At</th>
+                        {can.update && <th className="px-6 py-3 text-right font-medium text-muted-foreground">Actions</th>}
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30">
                     {fines.data.map((fine, index) => (
                         <tr key={fine.id} className="hover:bg-muted/20 transition-colors">
                             <td className="px-6 py-4 text-muted-foreground">{(fines.from ?? 0) + index}</td>
-                            {can.update && (
-                                <td className="px-6 py-4">{fine.user.name}</td>
-                            )}
+                            {can.update && <td className="px-6 py-4">{fine.user.name}</td>}
                             <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                     {fine.book.cover_url ? (
@@ -116,14 +119,25 @@ export default function FineIndex({ fines, filters, can }: Props) {
                                     <span className="max-w-48 truncate">{fine.book.title}</span>
                                 </div>
                             </td>
-                            <td className="px-6 py-4 text-muted-foreground">{fine.late_days} days</td>
-                            <td className="px-6 py-4 font-medium">{fine.formatted_amount}</td>
                             <td className="px-6 py-4">
-                                <Badge variant={fine.status === 'paid' ? 'secondary' : 'destructive'}>
-                                    {fine.status}
+                                <Badge variant={
+                                    fine.type === 'late' ? 'default' :
+                                    fine.type === 'damaged' ? 'secondary' :
+                                    'destructive'
+                                }>
+                                    {fine.type}
                                 </Badge>
                             </td>
                             <td className="px-6 py-4 text-muted-foreground">
+                                {fine.type === 'late' && fine.late_days ? `${fine.late_days} days` : '-'}
+                            </td>
+                            <td className="px-6 py-4 font-medium">{fine.formatted_amount}</td>
+                            <td className="px-6 py-4">
+                                <Badge variant={fine.status === 'paid' ? 'secondary' : 'outline'}>
+                                    {fine.status}
+                                </Badge>
+                            </td>
+                            <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                                 {new Date(fine.created_at).toLocaleDateString('id-ID')}
                             </td>
                             {can.update && (

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { route } from "ziggy-js";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AppLayout from "@/layouts/app-layout";
@@ -23,13 +25,54 @@ interface Props {
         expired_at: string;
         expires_in: number;
     } | null;
-    can: {
-        return: boolean;
-    };
+    can: { return: boolean };
 }
 
 export default function LoanShow({ loan, currentToken, can }: Props) {
     const [token, setToken] = useState('');
+    const [showFineDialog, setShowFineDialog] = useState(false);
+    const [damaged, setDamaged] = useState(false);
+    const [lost, setLost] = useState(false);
+    const [damagePercentage, setDamagePercentage] = useState(50);
+    const [fineProcessing, setFineProcessing] = useState(false);
+
+    const bookPrice = loan.book_unit.book.price ?? 0;
+    const damageFine = damaged ? Math.round(bookPrice * damagePercentage / 100) : 0;
+    const lostFine = lost ? bookPrice : 0;
+    const totalAdditionalFine = damageFine + lostFine;
+
+    const handleReturn = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.patch(route('loans.return', { loan: loan.id }), { token }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setToken('');
+                setShowFineDialog(true);
+            },
+        });
+    };
+
+    const handleAddFine = () => {
+        if (!damaged && !lost) {
+            setShowFineDialog(false);
+            return;
+        }
+        setFineProcessing(true);
+        router.post(route('loans.add-fine', { loan: loan.id }), {
+            damaged,
+            lost,
+            damage_percentage: damagePercentage,
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowFineDialog(false);
+                setFineProcessing(false);
+                setDamaged(false);
+                setLost(false);
+            },
+            onError: () => setFineProcessing(false),
+        });
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs(loan)}>
@@ -48,7 +91,6 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                             <p className="text-sm font-mono text-muted-foreground">{loan.book_unit.code}</p>
                         </div>
                     </div>
-
                     <div className="border-t border-border pt-4 space-y-2.5">
                         <div className="grid grid-cols-[140px_1fr] text-sm">
                             <span className="text-muted-foreground">Borrower</span>
@@ -77,24 +119,31 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                                 <span>{new Date(loan.returned_at).toLocaleDateString('id-ID')}</span>
                             </div>
                         )}
-                        <div className="grid grid-cols-[140px_1fr] text-sm">
-                            <span className="text-muted-foreground">Late Days</span>
-                            <span>{loan.late_days}</span>
-                        </div>
+                        {loan.late_days > 0 && (
+                            <div className="grid grid-cols-[140px_1fr] text-sm">
+                                <span className="text-muted-foreground">Late Days</span>
+                                <span className="text-destructive font-medium">{loan.late_days} days</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {can.return && (loan.status === 'active' || loan.status === 'overdue') && (
                     <div className="rounded-md border border-border bg-card p-6 space-y-4">
                         <p className="text-sm font-medium">Process Return</p>
-                        <form onSubmit={(e) => { e.preventDefault(); router.patch(route('loans.return', { loan: loan.id }), { token }, { preserveScroll: true, onSuccess: () => setToken('') }); }} className="space-y-3">
+                        <form onSubmit={handleReturn} className="space-y-3">
                             <div className="grid gap-2">
                                 <Label htmlFor="token">Return Token</Label>
-                                <Input id="token" value={token} onChange={e => setToken(e.target.value.toUpperCase())} placeholder="8-character token" className="font-mono w-48" maxLength={8} />
+                                <Input
+                                    id="token"
+                                    value={token}
+                                    onChange={e => setToken(e.target.value.toUpperCase())}
+                                    placeholder="8-character token"
+                                    className="font-mono w-48"
+                                    maxLength={8}
+                                />
                             </div>
-                            <Button type="submit" size="sm" disabled={token.length !== 8}>
-                                Process Return
-                            </Button>
+                            <Button type="submit" size="sm" disabled={token.length !== 8}>Process Return</Button>
                         </form>
                     </div>
                 )}
@@ -112,6 +161,58 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                     </div>
                 )}
             </div>
+
+            <Dialog open={showFineDialog} onOpenChange={setShowFineDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Additional Fines</DialogTitle>
+                        <DialogDescription>
+                            Return processed successfully. Is there any damage or loss to report?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <Checkbox id="damaged" checked={damaged} onCheckedChange={(val) => setDamaged(!!val)} />
+                            <Label htmlFor="damaged">Book is damaged</Label>
+                        </div>
+                        {damaged && (
+                            <div className="ml-7 space-y-2">
+                                <Label>Damage Percentage ({damagePercentage}%)</Label>
+                                <input type="range" min={1} max={100} value={damagePercentage} onChange={e => setDamagePercentage(Number(e.target.value))} className="w-full" />
+                                <p className="text-xs text-muted-foreground">
+                                    Fine: Rp {damageFine.toLocaleString('id-ID')}
+                                </p>
+                            </div>
+                        )}
+                        <div className="flex items-center gap-3">
+                            <Checkbox id="lost" checked={lost} onCheckedChange={(val) => setLost(!!val)} />
+                            <Label htmlFor="lost">Book is lost</Label>
+                        </div>
+                        {lost && (
+                            <p className="ml-7 text-xs text-muted-foreground">
+                                Fine: Rp {lostFine.toLocaleString('id-ID')}
+                            </p>
+                        )}
+                        {(damaged || lost) && (
+                            <div className="rounded-md bg-muted/40 border border-border p-3 text-sm">
+                                <span className="text-muted-foreground">Total Additional Fine: </span>
+                                <span className="font-semibold">Rp {totalAdditionalFine.toLocaleString('id-ID')}</span>
+                            </div>
+                        )}
+                        {bookPrice === 0 && (
+                            <p className="text-xs text-destructive">
+                                Warning: Book price is not set. Damaged and lost fines will be Rp 0.
+                            </p>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowFineDialog(false)}>Skip</Button>
+                        <Button onClick={handleAddFine} disabled={fineProcessing}>
+                            {damaged || lost ? 'Confirm Fines' : 'Done'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }
