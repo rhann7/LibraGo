@@ -13,6 +13,7 @@ export function AppSidebar() {
     const navGroups = admin ? [
         { icon: LayoutGrid, title: 'Dashboard', href: route('dashboard') },
         { icon: UsersRound, title: 'Users', items: [
+            { title: 'Users', href: route('users.index') },
             { title: 'Students', href: route('students.index') },
             { title: 'Teachers', href: route('teachers.index') },
         ] },
