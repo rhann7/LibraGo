@@ -7,12 +7,13 @@ use App\Models\Identiies\Teacher;
 use App\Models\Transactions\Fine;
 use App\Models\Transactions\Loan;
 use App\Models\Transactions\LoanRequest;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, HasRoles, Notifiable;
 
