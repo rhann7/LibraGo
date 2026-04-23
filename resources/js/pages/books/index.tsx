@@ -115,14 +115,18 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                 <table className="w-full text-sm">
                     <thead className="border-b border-border/50 bg-muted/30">
                         <tr>
-                            <th className="px-6 py-3 text-left font-medium text-muted-foreground">No</th>
-                            <th className="px-6 py-3 text-left font-medium text-muted-foreground">Cover</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground w-12">No</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground w-12">Cover</th>
                             <th className="px-6 py-3 text-left font-medium text-muted-foreground">Title</th>
-                            <th className="px-6 py-3 text-left font-medium text-muted-foreground">Author</th>
-                            <th className="px-6 py-3 text-left font-medium text-muted-foreground">Publisher</th>
-                            <th className="px-6 py-3 text-left font-medium text-muted-foreground">Category</th>
-                            <th className="px-6 py-3 text-left font-medium text-muted-foreground">Units</th>
-                            <th className="px-6 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Author</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Publisher</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Category</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">ISBN</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground w-16">Year</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground w-16">Pages</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground w-28 whitespace-nowrap">Price</th>
+                            <th className="px-6 py-3 text-left font-medium text-muted-foreground w-16">Units</th>
+                            <th className="px-6 py-3 text-right font-medium text-muted-foreground w-28">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border/30">
@@ -139,9 +143,15 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                     )}
                                 </td>
                                 <td className="px-6 py-4 font-medium max-w-48 truncate">{book.title}</td>
-                                <td className="px-6 py-4 text-muted-foreground">{book.author}</td>
-                                <td className="px-6 py-4 text-muted-foreground">{book.publisher || 'Unknown'}</td>
-                                <td className="px-6 py-4 text-muted-foreground">{book.category?.name ?? '-'}</td>
+                                <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">{book.author}</td>
+                                <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">{book.publisher || 'Unknown'}</td>
+                                <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">{book.category?.name ?? '-'}</td>
+                                <td className="px-6 py-4 font-mono text-muted-foreground text-xs whitespace-nowrap">{book.isbn ?? '-'}</td>
+                                <td className="px-6 py-4 text-muted-foreground">{book.year}</td>
+                                <td className="px-6 py-4 text-muted-foreground">{book.pages}</td>
+                                <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
+                                    {book.price ? `Rp ${book.price.toLocaleString('id-ID')}` : '-'}
+                                </td>
                                 <td className="px-6 py-4">{book.units_count}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex justify-end gap-2">
@@ -149,9 +159,7 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <InertiaLink href={route('book-units.index', { search: book.title })}>
-                                                        <Button size="sm" variant="outline">
-                                                            <Boxes className="h-3.5 w-3.5" />
-                                                        </Button>
+                                                        <Button size="sm" variant="outline"><Boxes className="h-3.5 w-3.5" /></Button>
                                                     </InertiaLink>
                                                 </TooltipTrigger>
                                                 <TooltipContent>Manage Units</TooltipContent>
@@ -161,9 +169,7 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                             <TooltipProvider delayDuration={0}>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <Button size="sm" variant="outline" onClick={() => openEdit(book)}>
-                                                            <Pencil className="h-3.5 w-3.5" />
-                                                        </Button>
+                                                        <Button size="sm" variant="outline" onClick={() => openEdit(book)}><Pencil className="h-3.5 w-3.5" /></Button>
                                                     </TooltipTrigger>
                                                     <TooltipContent>Edit</TooltipContent>
                                                 </Tooltip>
@@ -173,9 +179,7 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                             <TooltipProvider delayDuration={0}>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <Button size="sm" variant="destructive" onClick={() => handleDestroy(book)}>
-                                                            <Trash2 className="h-3.5 w-3.5" />
-                                                        </Button>
+                                                        <Button size="sm" variant="destructive" onClick={() => handleDestroy(book)}><Trash2 className="h-3.5 w-3.5" /></Button>
                                                     </TooltipTrigger>
                                                     <TooltipContent>Delete</TooltipContent>
                                                 </Tooltip>
@@ -293,27 +297,9 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                     <p className="mt-1 text-sm text-muted-foreground">Browse our book collection</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input defaultValue={filters.search ?? ''} onInput={handleSearch} placeholder="Search books..." className="pl-9 w-64" />
-                    </div>
-
-                    {categories.length > 0 && (
-                        <Select value={filters.category?.toString() ?? 'all'} onValueChange={(val) => router.get(route('books.index'), { ...filters, category: val === 'all' ? undefined : val }, { preserveState: true, replace: true })}>
-                            <SelectTrigger className="w-48">
-                                <SelectValue placeholder="All Categories" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Categories</SelectItem>
-                                {categories.map(c => (
-                                    <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    )}
-
-                    <Input type="number" placeholder="Year" className="w-28" defaultValue={filters.year ?? ''} onInput={(e) => router.get(route('books.index'), { ...filters, year: e.currentTarget.value || undefined }, { preserveState: true, replace: true })} />
+                <div className="relative w-full md:max-w-sm">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input defaultValue={filters.search ?? ''} onInput={handleSearch} placeholder="Search books..." className="pl-9 w-64" />
                 </div>
 
                 {books.data.length === 0 ? (
