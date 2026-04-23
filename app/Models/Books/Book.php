@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class Book extends Model
 {
-    protected $fillable = ['book_category_id', 'title', 'slug', 'author', 'publisher', 'isbn', 'cover', 'year', 'synopsis', 'pages'];
+    protected $fillable = ['book_category_id', 'title', 'slug', 'author', 'publisher', 'isbn', 'cover', 'price', 'year', 'synopsis', 'pages'];
     protected static function boot() {
         parent::boot();
         static::creating(function ($book) { $book->slug = Str::slug($book->title); });

@@ -4,7 +4,7 @@ import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import InputError from '@/components/input-error';
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from "@/components/ui/input";
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -190,7 +190,7 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
             </DataTableLayout>
 
             <Dialog open={open} onOpenChange={close}>
-                <DialogContent className="max-w-3xl!">
+                <DialogContent className="max-w-3xl! overflow-y-auto max-h-[90vh]">
                     <DialogHeader>
                         <DialogTitle>{editing ? 'Edit Book' : 'Add Book'}</DialogTitle>
                         <DialogDescription>{editing ? 'Update book details.' : 'Add a new book to the collection.'}</DialogDescription>
@@ -215,9 +215,7 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                             <div className="grid gap-2">
                                 <Label htmlFor="category">Category</Label>
                                 <Select value={form.data.book_category_id?.toString() ?? ''} onValueChange={val => form.setData('book_category_id', val ? Number(val) : null)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select category" />
-                                    </SelectTrigger>
+                                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                                     <SelectContent>
                                         {categories.map(c => (
                                             <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
@@ -243,22 +241,30 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                                     <InputError message={form.errors.isbn} />
                                 </div>
                             </div>
-                            {!editing && (
+                            <div className="grid grid-cols-2 gap-3">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="units" className="text-primary font-semibold">
-                                        Book Units <span className="text-[10px] text-muted-foreground italic">*Automatically create a book unit</span>
-                                    </Label>
-                                    <Input id="units" type="number" value={form.data.units} onChange={e => form.setData('units', Number(e.target.value))} placeholder="10" className="bg-background" />
-                                    <InputError message={form.errors.units} />
+                                    <Label htmlFor="price">Price</Label>
+                                    <Input id="price" type="number" value={form.data.price ?? ''} onChange={e => form.setData('price', e.target.value ? Number(e.target.value) : null)} placeholder="50000" />
+                                    <InputError message={form.errors.price} />
                                 </div>
-                            )}
+                                {!editing && (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="units" className="text-primary font-semibold">Book Units <span className="text-[10px] text-muted-foreground italic">*Automatically create a book unit</span></Label>
+                                        <Input id="units" type="number" value={form.data.units} onChange={e => form.setData('units', Number(e.target.value))} placeholder="10" className="bg-background" />
+                                        <InputError message={form.errors.units} />
+                                    </div>
+                                )}
+                            </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="synopsis">Synopsis</Label>
                                 <Textarea id="synopsis" value={form.data.synopsis} onChange={e => form.setData('synopsis', e.target.value)} placeholder="Book synopsis..." className="resize-none h-32" />
                                 <InputError message={form.errors.synopsis} />
                             </div>
+                            <div className="flex justify-end gap-2">
+                                <Button type="button" variant="outline" onClick={close}>Cancel</Button>
+                                <Button type="submit" disabled={form.processing}>{editing ? 'Update' : 'Create'}</Button>
+                            </div>
                         </div>
-
                         <div className="flex flex-col gap-3 w-40">
                             <Label>Cover</Label>
                             <div className="h-56 w-40 overflow-hidden rounded-sm border border-border bg-muted flex items-center justify-center">
@@ -273,13 +279,6 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                             <Input type="file" accept="image/*" className="text-xs w-40" onChange={e => setCover(e.target.files?.[0] ?? null)} />
                             <InputError message={form.errors.cover} />
                         </div>
-
-                        <DialogFooter className="col-span-2">
-                            <Button type="button" variant="outline" onClick={close}>Cancel</Button>
-                            <Button type="submit" disabled={form.processing}>
-                                {editing ? 'Update' : 'Create'}
-                            </Button>
-                        </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>

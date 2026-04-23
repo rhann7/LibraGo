@@ -22,6 +22,7 @@ export type Book = {
     publisher: string;
     isbn: string | null;
     cover_url: string | null;
+    price: number | null;
     year: number;
     synopsis: string | null;
     pages: number;
@@ -34,6 +35,7 @@ export type Book = {
         publisher: string;
         isbn: string;
         cover: File | null;
+        price: number | null;
         year: number;
         synopsis: string;
         pages: number;

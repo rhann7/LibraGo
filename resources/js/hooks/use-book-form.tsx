@@ -16,6 +16,7 @@ export function useBookForm() {
         publisher: '',
         isbn: '',
         cover: null as File | null,
+        price: null as number | null,
         year: '' as unknown as number,
         synopsis: '',
         pages: '' as unknown as number,

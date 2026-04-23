@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('publisher')->nullable();
             $table->string('isbn')->unique()->nullable();
             $table->string('cover')->nullable();
+            $table->unsignedInteger('price')->nullable();
             $table->year('year');
             $table->text('synopsis')->nullable();
             $table->unsignedInteger('pages')->nullable();

@@ -23,6 +23,7 @@ class BookRequest extends FormRequest
             'publisher'        => ['nullable', 'string', 'max:255'],
             'isbn'             => ['nullable', 'string', Rule::unique('books', 'isbn')->ignore($bookId)],
             'cover'            => array_filter(['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', $bookId ? 'sometimes' : null]),
+            'price'            => ['nullable', 'integer', 'min:0'],
             'year'             => ['required', 'integer', 'digits:4', 'min:1000', 'max:' . date('Y')],
             'synopsis'         => ['nullable', 'string'],
             'pages'            => ['required', 'integer', 'min:1'],
