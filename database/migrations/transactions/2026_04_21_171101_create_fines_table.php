@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('loan_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->integer('late_days');
+            $table->enum('type', ['late', 'damaged', 'lost'])->default('late');
+            $table->integer('late_days')->nullable();
             $table->integer('amount');
             $table->enum('status', ['unpaid', 'paid'])->default('unpaid');
             $table->timestamp('paid_at')->nullable();
