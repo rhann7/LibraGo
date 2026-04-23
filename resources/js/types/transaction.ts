@@ -20,16 +20,13 @@ export type LoanRequest = {
 
 export type Loan = {
     id: number;
-    status: 'active'| 'overdue' | 'returned';
+    status: 'active' | 'overdue' | 'returned';
     borrowed_at: string;
     due_date: string;
     returned_at: string | null;
     is_overdue: boolean;
     late_days: number;
-    user: {
-        id: number;
-        name: string;
-    };
+    user: { id: number; name: string };
     book_unit: {
         id: number;
         code: string;
@@ -37,6 +34,20 @@ export type Loan = {
             id: number;
             title: string;
             cover_url: string | null;
+            price: number | null;
         };
     };
+};
+
+export type Fine = {
+    id: number;
+    user: { id: number; name: string };
+    book: { title: string; cover_url: string | null };
+    type: 'late' | 'damaged' | 'lost';
+    late_days: number | null;
+    amount: number;
+    formatted_amount: string;
+    status: 'unpaid' | 'paid';
+    paid_at: string | null;
+    created_at: string;
 };
