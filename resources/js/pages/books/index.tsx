@@ -46,6 +46,8 @@ interface Props {
     filters: {
         search?: string;
         category?: number;
+        author?: string;
+        publisher?: string;
         year?: number;
     };
     can: Can;
@@ -53,9 +55,11 @@ interface Props {
         id: number; 
         name: string;
     }[];
+    authors: string[];
+    publishers: string[];
 }
 
-export default function BookIndex({ books, filters, can, categories }: Props) {
+export default function BookIndex({ books, filters, can, categories, authors, publishers }: Props) {
     const { open, editing, preview, form, setCover, openCreate, openEdit, close, submit } = useBookForm();
 
     const handleSearch: FormEventHandler<HTMLInputElement> = (e) => {
@@ -84,6 +88,30 @@ export default function BookIndex({ books, filters, can, categories }: Props) {
                         <SelectItem value="all">All Categories</SelectItem>
                         {categories.map(c => (
                             <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
+
+            {authors.length > 0 && (
+                <Select value={filters.author ?? 'all'} onValueChange={(val) => router.get(route('books.index'), { ...filters, author: val === 'all' ? undefined : val }, { preserveState: true, replace: true })}>
+                    <SelectTrigger className="w-40"><SelectValue placeholder="Author" /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Authors</SelectItem>
+                        {authors.map(a => (
+                            <SelectItem key={a} value={a}>{a}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
+
+            {publishers.length > 0 && (
+                <Select value={filters.publisher ?? 'all'} onValueChange={(val) => router.get(route('books.index'), { ...filters, publisher: val === 'all' ? undefined : val }, { preserveState: true, replace: true })}>
+                    <SelectTrigger className="w-40"><SelectValue placeholder="Publisher" /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Publishers</SelectItem>
+                        {publishers.map(p => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
                         ))}
                     </SelectContent>
                 </Select>

@@ -30,10 +30,12 @@ class BookController extends Controller implements HasMiddleware
         $admin = $user->isAdmin();
 
         return Inertia::render('books/index', [
-            'books'   => $this->getBooks($request->search, $request->category, $request->year, $request->pages_min, $request->pages_max),
-            'filters' => $request->only(['search', 'category', 'year']),
-            'can'     => ['create' => $admin, 'edit' => $admin, 'delete' => $admin],
+            'books'      => $this->getBooks($request->search, $request->category, $request->author, $request->publisher, $request->year),
+            'filters'    => $request->only(['search', 'category', 'author', 'publisher', 'year']),
+            'can'        => ['create' => $admin, 'edit' => $admin, 'delete' => $admin],
             'categories' => BookCategory::orderBy('name')->get(['id', 'name']),
+            'authors'    => Book::distinct()->orderBy('author')->pluck('author'),
+            'publishers' => Book::distinct()->orderBy('publisher')->pluck('publisher'),
         ]);
     }
 
@@ -59,7 +61,7 @@ class BookController extends Controller implements HasMiddleware
             }
         });
 
-        return to_route('books.index')->with('success', "Book and {$request->units} units created successfully");
+        return to_route('books.index')->with('success', "Book and " . ($request->units ?? 0) . " units created successfully");
     }
     
     public function update(BookRequest $request, Book $book)
@@ -88,7 +90,7 @@ class BookController extends Controller implements HasMiddleware
             ->first();
 
         return Inertia::render('books/show', [
-            'book'          => $this->transformSingleBook($book->load('category')->loadCount('units')),
+            'book'          => $this->transformSingleBook($book->load('category')->loadCount(['units as units_count' => fn($q) => $q->where('status', 'available')])),
             'bookUnit'      => $bookUnit ? ['id' => $bookUnit->id] : null,
             'activeRequest' => $activeRequest ? ['id' => $activeRequest->id, 'status' => $activeRequest->status] : null,
         ]);
@@ -101,17 +103,18 @@ class BookController extends Controller implements HasMiddleware
         return to_route('books.index')->with('success', 'Book deleted successfully');
     }
 
-    private function getBooks(?string $search = null, ?int $category = null, ?int $year = null, ?int $pagesMin = null, ?int $pagesMax = null)
+    private function getBooks(?string $search = null, ?int $category = null, ?string $author = null, ?string $publisher = null, ?int $year = null)
     {
         return $this->transformBooks(
             Book::query()
                 ->with('category')
-                ->withCount('units')
+                ->withCount(['units' => fn($q) => $q->where('status', 'available')])
+                ->when(!Auth::user()->isAdmin(), fn($q) => $q->whereHas('units', fn($uq) => $uq->where('status', 'available')))
                 ->when($search, fn($q) => $q->where('title', 'like', "%{$search}%")->orWhere('author', 'like', "%{$search}%")->orWhere('publisher', 'like', "%{$search}%"))
                 ->when($category, fn($q) => $q->where('book_category_id', $category))
+                ->when($author, fn($q) => $q->where('author', 'like', "%{$author}%"))
+                ->when($publisher, fn($q) => $q->where('publisher', 'like', "%{$publisher}%"))
                 ->when($year, fn($q) => $q->where('year', $year))
-                ->when($pagesMin, fn($q) => $q->where('pages', '>=', $pagesMin))
-                ->when($pagesMax, fn($q) => $q->where('pages', '<=', $pagesMax))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString()
