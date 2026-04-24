@@ -33,7 +33,7 @@ class HomeController extends Controller
             ->withCount('books')
             ->having('books_count', '>', 0)
             ->orderByDesc('books_count')
-            ->take(8)
+            ->take(5)
             ->get()
             ->map(fn($cat) => [
                 'id'    => $cat->id,

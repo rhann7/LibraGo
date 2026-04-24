@@ -95,8 +95,8 @@ export default function Home({ popular_books, categories }: Props) {
                                         {book.cover_url ? (
                                             <img src={book.cover_url} alt={book.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                                         ) : (
-                                            <div className="flex h-full w-full items-center justify-center">
-                                                <BookOpen className="h-8 w-8 text-muted-foreground/40" />
+                                            <div className={`h-full w-full bg-linear-to-br ${getGradient(book.id)} flex items-center justify-center`}>
+                                                <BookOpen className="h-8 w-8 text-white/40" />
                                             </div>
                                         )}
                                         <div className="absolute bottom-2 right-2 rounded-md bg-black/60 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
