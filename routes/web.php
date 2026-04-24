@@ -21,3 +21,4 @@ require __DIR__.'/auth.php';
 require __DIR__.'/books.php';
 require __DIR__.'/transactions.php';
 require __DIR__.'/identities.php';
+require __DIR__.'/exports.php';
