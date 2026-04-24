@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
             $table->string('code')->unique();
-            $table->enum('condition', ['good', 'damaged'])->default('good');
-            $table->enum('status', ['available', 'reserved', 'borrowed', 'lost'])->default('available');
+            $table->enum('condition', ['good', 'damaged', 'lost'])->default('good');
+            $table->enum('status', ['available', 'reserved', 'borrowed', 'damaged', 'lost'])->default('available');
             $table->text('note')->nullable();
             $table->timestamps();
         });

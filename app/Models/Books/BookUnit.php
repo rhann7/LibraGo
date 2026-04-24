@@ -2,7 +2,6 @@
 
 namespace App\Models\Books;
 
-use App\Models\Transactions\Loan;
 use App\Models\Transactions\LoanRequest;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,8 +24,12 @@ class BookUnit extends Model
     public function scopeAvailable($query) { return $query->where('status', 'available'); }
     public function scopeReserved($query) { return $query->where('status', 'reserved'); }
     public function scopeBorrowed($query) { return $query->where('status', 'borrowed'); }
+    public function scopeDamaged($query) { return $query->where('status', 'damaged'); }
     public function scopeLost($query) { return $query->where('status', 'lost'); }
 
     public function isAvailable(): bool { return $this->status === 'available'; }
+    public function isReserved(): bool { return $this->status === 'reserved'; }
+    public function isBorrowed(): bool { return $this->status === 'borrowed'; }
+    public function isDamaged(): bool { return $this->status === 'damaged'; }
     public function isLost(): bool { return $this->status === 'lost'; }
 }

@@ -153,7 +153,7 @@ class LoanController extends Controller implements HasMiddleware
                     'status'  => 'unpaid',
                 ]);
 
-                if ($request->damage_percentage > 50) $loan->loanRequest->bookUnit->update(['condition' => 'damaged']);
+                if ($request->damage_percentage > 50) $loan->loanRequest->bookUnit->update(['condition' => 'damaged', 'status' => 'damaged']);
             }
 
             if ($request->lost) {
@@ -165,7 +165,7 @@ class LoanController extends Controller implements HasMiddleware
                     'status'  => 'unpaid',
                 ]);
 
-                $loan->loanRequest->bookUnit->update(['status' => 'lost']);
+                $loan->loanRequest->bookUnit->update(['condition' => 'lost', 'status' => 'lost']);
             }
         });
 

@@ -18,8 +18,8 @@ class BookUnitRequest extends FormRequest
 
         return [
             'book_id'   => ['required', 'exists:books,id'],
-            'condition' => ['required', Rule::in(['good', 'damaged'])],
-            'status'    => ['required', Rule::in(['available', 'reserved', 'borrowed', 'lost'])],
+            'condition' => ['required', Rule::in(['good', 'damaged', 'lost'])],
+            'status'    => ['required', Rule::in(['available', 'reserved', 'borrowed', 'damaged', 'lost'])],
             'note'      => ['nullable', 'string', 'max:500'],
         ];
     }

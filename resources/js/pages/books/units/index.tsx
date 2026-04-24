@@ -68,6 +68,7 @@ export default function BookUnitIndex({ units, filters, books }: Props) {
                     <SelectItem value="all">All Conditions</SelectItem>
                     <SelectItem value="good">Good</SelectItem>
                     <SelectItem value="damaged">Damaged</SelectItem>
+                    <SelectItem value="lost">Lost</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -80,6 +81,7 @@ export default function BookUnitIndex({ units, filters, books }: Props) {
                     <SelectItem value="available">Available</SelectItem>
                     <SelectItem value="reserved">Reserved</SelectItem>
                     <SelectItem value="borrowed">Borrowed</SelectItem>
+                    <SelectItem value="damaged">Damaged</SelectItem>
                     <SelectItem value="lost">Lost</SelectItem>
                 </SelectContent>
             </Select>
@@ -211,6 +213,7 @@ export default function BookUnitIndex({ units, filters, books }: Props) {
                                     <SelectContent>
                                         <SelectItem value="good">Good</SelectItem>
                                         <SelectItem value="damaged">Damaged</SelectItem>
+                                        <SelectItem value="lost">Lost</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <InputError message={form.errors.condition} />
@@ -225,6 +228,7 @@ export default function BookUnitIndex({ units, filters, books }: Props) {
                                         <SelectItem value="available">Available</SelectItem>
                                         <SelectItem value="reserved">Reserved</SelectItem>
                                         <SelectItem value="borrowed">Borrowed</SelectItem>
+                                        <SelectItem value="damaged">Damaged</SelectItem>
                                         <SelectItem value="lost">Lost</SelectItem>
                                     </SelectContent>
                                 </Select>

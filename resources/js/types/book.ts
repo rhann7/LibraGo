@@ -46,8 +46,8 @@ export type Book = {
 export type BookUnit = {
     id: number;
     code: string;
-    condition: 'good' | 'damaged';
-    status: 'available' | 'reserved' | 'borrowed' | 'lost';
+    condition: 'good' | 'damaged' | 'lost';
+    status: 'available' | 'reserved' | 'borrowed' | 'damaged' | 'lost';
     note: string;
     book: {
         id: number;
@@ -61,7 +61,7 @@ export type BookUnit = {
     form_default: {
         book_id: number;
         condition: 'good' | 'damaged';
-        status: 'available' | 'reserved' | 'borrowed' | 'lost';
+        status: 'available' | 'reserved' | 'borrowed' | 'damaged' | 'lost';
         note: string;
     };
 };

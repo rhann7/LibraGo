@@ -10,8 +10,8 @@ export function useBookUnitForm() {
     const form = useForm({
         _method: '' as string,
         book_id: null as number | null,
-        condition: 'good' as 'good' | 'damaged',
-        status: 'available' as 'available' | 'reserved' | 'borrowed' | 'lost',
+        condition: 'good' as 'good' | 'damaged' | 'lost',
+        status: 'available' as 'available' | 'reserved' | 'borrowed' | 'damaged' | 'lost',
         note: '',
     });
 
