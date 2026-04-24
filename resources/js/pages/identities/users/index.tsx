@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/react";
-import { Search, Trash2, User } from "lucide-react";
+import { Download, Search, Trash2, User } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,11 @@ export default function UserIndex({ users, filters }: Props) {
         }
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.users') + (params ? `?${params}` : '');
+    };
+
     const filterWidget = (
         <div className="flex items-center gap-3">
             <div className="relative">
@@ -65,12 +70,19 @@ export default function UserIndex({ users, filters }: Props) {
         </div>
     );
 
+    const actions = (
+        <Button onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" /> Export
+        </Button>
+    );
+
     return (
         <DataTableLayout
             title="Users"
             description="Manage registered user accounts"
             breadcrumbs={breadcrumbs}
             filterWidget={filterWidget}
+            actions={actions}
             pagination={users}
             isEmpty={users.data.length === 0}
             emptyStateTitle="No users found"
