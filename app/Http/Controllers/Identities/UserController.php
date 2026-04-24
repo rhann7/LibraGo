@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Identities;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -11,6 +12,33 @@ use Inertia\Inertia;
 
 class UserController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $users = User::query()
+            ->with('roles')
+            ->whereDoesntHave('roles', fn($q) => $q->where('name', 'admin'))
+            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%"))
+            ->when($request->role, fn($q) => $q->role($request->role))
+            ->latest()
+            ->get();
+
+        return $this->exportData(
+            $users,
+            'registered-users',
+            ['ID', 'Full Name', 'Email', 'Role', 'Registered At'],
+            fn($user) => [
+                $user->id,
+                $user->name,
+                $user->email,
+                $user->getRoleNames()->first() ?? '-',
+                $user->created_at->format('d/m/Y H:i'),
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [new Middleware('role:admin')];
