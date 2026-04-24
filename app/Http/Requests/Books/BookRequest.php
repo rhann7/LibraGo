@@ -27,7 +27,7 @@ class BookRequest extends FormRequest
             'year'             => ['required', 'integer', 'digits:4', 'min:1000', 'max:' . date('Y')],
             'synopsis'         => ['nullable', 'string'],
             'pages'            => ['required', 'integer', 'min:1'],
-            'units'            => [$bookId ? 'nullable' : 'required', 'integer', 'min:0', 'max:100'],
+            'units'            => ['nullable', 'integer', 'min:0', 'max:100'],
         ];
     }
 }
