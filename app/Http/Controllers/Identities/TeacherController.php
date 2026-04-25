@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Identities\UserTeacherRequest;
 use App\Models\Identiies\Teacher;
 use App\Models\User;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -14,6 +15,30 @@ use Inertia\Inertia;
 
 class TeacherController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $teachers = Teacher::query()
+            ->with('user')
+            ->when($request->search, fn($q) => $q->where('nik', 'like', "%{$request->search}%")
+                ->orWhereHas('user', fn($q) => $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")))
+            ->latest()
+            ->get();
+
+        return $this->exportData($teachers,
+            'teachers',
+            ['ID', 'NIK', 'Name', 'Email'],
+            fn($t) => [
+                $t->id,
+                $t->nik,
+                $t->user->name,
+                $t->user->email,
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [

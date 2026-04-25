@@ -1,6 +1,6 @@
 import { Link as InertiaLink } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
-import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Download, Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import InputError from "@/components/input-error";
@@ -44,6 +44,11 @@ export default function StudentIndex({ students, filters }: Props) {
         }
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.students') + (params ? `?${params}` : '');
+    };
+
     const filterWidget = (
         <div className="flex items-center gap-3">
             <div className="relative">
@@ -64,9 +69,15 @@ export default function StudentIndex({ students, filters }: Props) {
     );
 
     const actions = (
-        <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" /> Add Student
-        </Button>
+        <>
+            <Button onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" /> Export
+            </Button>
+
+            <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" /> Add Student
+            </Button>
+        </>
     );
 
     return (

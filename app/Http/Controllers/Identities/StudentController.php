@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Identities;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Identities\UserStudentRequest;
 use App\Models\Identiies\StudentMaster;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -12,6 +13,34 @@ use Inertia\Inertia;
 
 class StudentController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $students = StudentMaster::query()
+            ->with('student.user')
+            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
+                ->orWhere('nipd', 'like', "%{$request->search}%"))
+            ->when($request->registered, fn($q) => $request->registered === 'registered'
+                ? $q->whereHas('student')
+                : $q->whereDoesntHave('student'))
+            ->latest()
+            ->get();
+
+        return $this->exportData($students,
+            'students',
+            ['ID', 'NIPD', 'Name', 'Class', 'Status', 'Email'],
+            fn($s) => [
+                $s->id,
+                $s->nipd,
+                $s->name,
+                $s->class_name,
+                $s->student ? 'Registered' : 'Unregistered',
+                $s->student?->user?->email ?? '-',
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [

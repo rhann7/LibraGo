@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { Link as InertiaLink } from '@inertiajs/react';
-import { Eye, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Download, Eye, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import type { FormEventHandler } from 'react';
 import { route } from 'ziggy-js';
 import InputError from '@/components/input-error';
@@ -43,24 +43,30 @@ export default function TeacherIndex({ teachers, filters }: Props) {
         }
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.teachers') + (params ? `?${params}` : '');
+    };
+
     const filterWidget = (
         <div className="flex items-center gap-3">
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                    defaultValue={filters.search ?? ''}
-                    onInput={handleSearch}
-                    placeholder="Search teachers..."
-                    className="pl-9 w-64"
-                />
+                <Input defaultValue={filters.search ?? ''} onInput={handleSearch} placeholder="Search teachers..." className="pl-9 w-64" />
             </div>
         </div>
     );
 
     const actions = (
-        <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" /> Add Teacher
-        </Button>
+        <>
+            <Button onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" /> Export
+            </Button>
+
+            <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" /> Add Teacher
+            </Button>
+        </>
     );
 
     return (
@@ -146,57 +152,27 @@ export default function TeacherIndex({ teachers, filters }: Props) {
                     <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
-                            <Input
-                                id="name"
-                                value={form.data.name}
-                                onChange={e => form.setData('name', e.target.value)}
-                                placeholder="Teacher name"
-                            />
+                            <Input id="name" value={form.data.name} onChange={e => form.setData('name', e.target.value)} placeholder="Teacher name" />
                             <InputError message={form.errors.name} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={form.data.email}
-                                onChange={e => form.setData('email', e.target.value)}
-                                placeholder="teacher@example.com"
-                            />
+                            <Input id="email" type="email" value={form.data.email} onChange={e => form.setData('email', e.target.value)} placeholder="teacher@example.com" />
                             <InputError message={form.errors.email} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="nik">NIK</Label>
-                            <Input
-                                id="nik"
-                                value={form.data.nik}
-                                onChange={e => form.setData('nik', e.target.value)}
-                                placeholder="Teacher NIK"
-                            />
+                            <Input id="nik" value={form.data.nik} onChange={e => form.setData('nik', e.target.value)} placeholder="Teacher NIK" />
                             <InputError message={form.errors.nik} />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="password">
-                                Password {editing && <span className="text-muted-foreground text-xs">(leave blank to keep current)</span>}
-                            </Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={form.data.password}
-                                onChange={e => form.setData('password', e.target.value)}
-                                placeholder={editing ? '••••••••' : 'Password'}
-                            />
+                            <Label htmlFor="password">Password {editing && <span className="text-muted-foreground text-xs">(leave blank to keep current)</span>}</Label>
+                            <Input id="password" type="password" value={form.data.password} onChange={e => form.setData('password', e.target.value)} placeholder={editing ? '••••••••' : 'Password'} />
                             <InputError message={form.errors.password} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="password_confirmation">Confirm Password</Label>
-                            <Input
-                                id="password_confirmation"
-                                type="password"
-                                value={form.data.password_confirmation}
-                                onChange={e => form.setData('password_confirmation', e.target.value)}
-                                placeholder={editing ? '••••••••' : 'Confirm password'}
-                            />
+                            <Input id="password_confirmation" type="password" value={form.data.password_confirmation} onChange={e => form.setData('password_confirmation', e.target.value)} placeholder={editing ? '••••••••' : 'Confirm password'} />
                             <InputError message={form.errors.password_confirmation} />
                         </div>
                         <DialogFooter>
