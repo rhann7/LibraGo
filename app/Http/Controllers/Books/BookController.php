@@ -7,6 +7,7 @@ use App\Http\Requests\Books\BookRequest;
 use App\Models\Books\Book;
 use App\Models\Books\BookCategory;
 use App\Models\Books\BookUnit;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -17,6 +18,41 @@ use Inertia\Inertia;
 
 class BookController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $books = Book::query()
+            ->with('category')
+            ->withCount('units')
+            ->when($request->search, fn($q) => $q->where('title', 'like', "%{$request->search}%")
+                ->orWhere('author', 'like', "%{$request->search}%")
+                ->orWhere('publisher', 'like', "%{$request->search}%"))
+            ->when($request->category, fn($q) => $q->where('book_category_id', $request->category))
+            ->when($request->author, fn($q) => $q->where('author', 'like', "%{$request->author}%"))
+            ->when($request->publisher, fn($q) => $q->where('publisher', 'like', "%{$request->publisher}%"))
+            ->when($request->year, fn($q) => $q->where('year', $request->year))
+            ->latest()
+            ->get();
+
+        return $this->exportData($books,
+            'books',
+            ['ID', 'Title', 'Author', 'Publisher', 'Category', 'ISBN', 'Year', 'Pages', 'Price', 'Units'],
+            fn($b) => [
+                $b->id,
+                $b->title,
+                $b->author ?? '-',
+                $b->publisher ?? '-',
+                $b->category?->name ?? '-',
+                $b->isbn ?? '-',
+                $b->year,
+                $b->pages,
+                $b->price ?? '-',
+                $b->units_count,
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [

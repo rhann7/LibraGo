@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Books;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Books\BookCategoryRequest;
 use App\Models\Books\BookCategory;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -12,6 +13,28 @@ use Inertia\Inertia;
 
 class BookCategoryController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $categories = BookCategory::query()
+            ->withCount('books')
+            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%"))
+            ->latest()
+            ->get();
+
+        return $this->exportData($categories,
+            'book-categories',
+            ['ID', 'Name', 'Slug', 'Total Books'],
+            fn($c) => [
+                $c->id,
+                $c->name,
+                $c->slug,
+                $c->books_count,
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [

@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/react";
-import { BookOpen, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { BookOpen, Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import InputError from "@/components/input-error";
@@ -53,6 +53,11 @@ export default function BookUnitIndex({ units, filters, books }: Props) {
         }
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.book-units') + (params ? `?${params}` : '');
+    };
+
     const filterWidget = (
         <div className="flex items-center gap-3">
             <div className="relative">
@@ -89,9 +94,15 @@ export default function BookUnitIndex({ units, filters, books }: Props) {
     );
 
     const actions = (
-        <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" /> Add Unit
-        </Button>
+        <>
+            <Button onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" /> Export
+            </Button>
+
+            <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" /> Add Unit
+            </Button>
+        </>
     );
 
     return (

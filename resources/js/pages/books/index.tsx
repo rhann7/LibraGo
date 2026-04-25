@@ -1,5 +1,5 @@
 import { router, Link as InertiaLink } from "@inertiajs/react";
-import { BookOpen, Boxes, ChevronLeft, ChevronRight, Inbox, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { BookOpen, Boxes, ChevronLeft, ChevronRight, Download, Inbox, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import InputError from '@/components/input-error';
@@ -64,13 +64,18 @@ export default function BookIndex({ books, filters, can, categories, authors, pu
 
     const handleSearch: FormEventHandler<HTMLInputElement> = (e) => {
         router.get(route('books.index'), { ...filters, search: e.currentTarget.value }, { preserveState: true, replace: true });
-    }
+    };
 
     const handleDestroy = (book: Book) => {
         if (confirm(`Delete "${book.title}"?`)) {
             router.delete(route('books.destroy', book.id), { preserveScroll: true });
         }
-    }
+    };
+
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.books') + (params ? `?${params}` : '');
+    };
 
     const filterWidget = (
         <div className="flex items-center gap-3">
@@ -121,11 +126,17 @@ export default function BookIndex({ books, filters, can, categories, authors, pu
         </div>
     );
 
-    const actions = can.create ? (
-        <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" /> Add Book
-        </Button>
-    ) : undefined;
+    const actions = (
+        <>
+            <Button onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" /> Export
+            </Button>
+        
+            <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" /> Add Book
+            </Button>
+        </>
+    );
 
     if (can.create) return (
         <>

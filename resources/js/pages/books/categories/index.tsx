@@ -1,5 +1,5 @@
 import { router, Link as InertiaLink } from '@inertiajs/react';
-import { Plus, Pencil, Trash2, Search, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Inbox, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { type FormEventHandler } from 'react';
 import { route } from 'ziggy-js';
 import InputError from '@/components/input-error';
@@ -58,6 +58,11 @@ export default function BookCategoryIndex({ categories, filters, can }: Props) {
         }
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.book-categories') + (params ? `?${params}` : '');
+    };
+
     const filterWidget = (
         <div className="relative w-full md:max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -65,11 +70,17 @@ export default function BookCategoryIndex({ categories, filters, can }: Props) {
         </div>
     );
 
-    const actions = can.create ? (
-        <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" /> Add Category
-        </Button>
-    ) : undefined;
+    const actions = (
+        <>
+            <Button onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" /> Export
+            </Button>
+        
+            <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" /> Add Category
+            </Button>
+        </>
+    );
 
     if (can.create) return (
         <>

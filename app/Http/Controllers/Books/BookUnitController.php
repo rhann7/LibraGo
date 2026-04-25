@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Books\BookUnitRequest;
 use App\Models\Books\Book;
 use App\Models\Books\BookUnit;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -13,6 +14,33 @@ use Inertia\Inertia;
 
 class BookUnitController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $units = BookUnit::query()
+            ->with('book')
+            ->when($request->search, fn($q) => $q->where('code', 'like', "%{$request->search}%")
+                ->orWhereHas('book', fn($q) => $q->where('title', 'like', "%{$request->search}%")))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->condition, fn($q) => $q->where('condition', $request->condition))
+            ->latest()
+            ->get();
+
+        return $this->exportData($units,
+            'book-units',
+            ['ID', 'Code', 'Book', 'Condition', 'Status', 'Note'],
+            fn($u) => [
+                $u->id,
+                $u->code,
+                $u->book->title,
+                $u->condition,
+                $u->status,
+                $u->note ?? '-',
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [
