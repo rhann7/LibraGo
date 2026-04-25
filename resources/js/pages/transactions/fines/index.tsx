@@ -20,10 +20,11 @@ interface Fine {
     user: { id: number; name: string };
     book: { title: string; cover_url: string | null };
     type: 'late' | 'damaged' | 'lost';
+    status: 'unpaid' | 'paid';
+    note: string | null;
     late_days: number | null;
     amount: number;
     formatted_amount: string;
-    status: 'unpaid' | 'paid';
     paid_at: string | null;
     created_at: string;
 }
@@ -110,6 +111,7 @@ export default function FineIndex({ fines, filters, can }: Props) {
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Late Days</th>
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground">Amount</th>
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground">Status</th>
+                        <th className="px-6 py-3 text-left font-medium text-muted-foreground">Note</th>
                         <th className="px-6 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Created At</th>
                         {can.update && <th className="px-6 py-3 text-right font-medium text-muted-foreground">Actions</th>}
                     </tr>
@@ -148,6 +150,9 @@ export default function FineIndex({ fines, filters, can }: Props) {
                                 <Badge variant={fine.status === 'paid' ? 'secondary' : 'outline'}>
                                     {fine.status}
                                 </Badge>
+                            </td>
+                            <td className="px-6 py-4 text-muted-foreground">
+                                {fine.note || '-'}
                             </td>
                             <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                                 {new Date(fine.created_at).toLocaleDateString('id-ID')}

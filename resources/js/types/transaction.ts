@@ -44,10 +44,11 @@ export type Fine = {
     user: { id: number; name: string };
     book: { title: string; cover_url: string | null };
     type: 'late' | 'damaged' | 'lost';
+    status: 'unpaid' | 'paid';
+    note: string | null;
     late_days: number | null;
     amount: number;
     formatted_amount: string;
-    status: 'unpaid' | 'paid';
     paid_at: string | null;
     created_at: string;
 };
