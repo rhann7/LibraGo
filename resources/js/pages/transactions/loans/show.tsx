@@ -60,11 +60,7 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
             return;
         }
         setFineProcessing(true);
-        router.post(route('loans.add-fine', { loan: loan.id }), {
-            damaged,
-            lost,
-            damage_percentage: damagePercentage,
-        }, {
+        router.post(route('loans.add-fine', { loan: loan.id }), { damaged, lost, damage_percentage: damagePercentage, note}, {
             preserveScroll: true,
             onSuccess: () => {
                 setShowFineDialog(false);
@@ -136,14 +132,7 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                         <form onSubmit={handleReturn} className="space-y-3">
                             <div className="grid gap-2">
                                 <Label htmlFor="token">Return Token</Label>
-                                <Input
-                                    id="token"
-                                    value={token}
-                                    onChange={e => setToken(e.target.value.toUpperCase())}
-                                    placeholder="8-character token"
-                                    className="font-mono w-48"
-                                    maxLength={8}
-                                />
+                                <Input id="token" value={token} onChange={e => setToken(e.target.value.toUpperCase())} placeholder="8-character token" className="font-mono w-48" maxLength={8} />
                             </div>
                             <Button type="submit" size="sm" disabled={token.length !== 8}>Process Return</Button>
                         </form>
