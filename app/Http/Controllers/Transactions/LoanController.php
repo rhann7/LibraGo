@@ -151,9 +151,9 @@ class LoanController extends Controller implements HasMiddleware
                     'loan_id'   => $loan->id,
                     'user_id'   => $loan->loanRequest->user_id,
                     'type'      => 'late',
+                    'status'    => 'unpaid',
                     'late_days' => $lateDays,
                     'amount'    => $lateDays * 2000,
-                    'status'    => 'unpaid',
                 ]);
             }
         });
@@ -167,6 +167,7 @@ class LoanController extends Controller implements HasMiddleware
             'damaged'           => ['boolean'],
             'lost'              => ['boolean'],
             'damage_percentage' => ['required_if:damaged,true', 'integer', 'min:1', 'max:100'],
+            'note'              => ['nullable', 'string', 'max:255'],
         ]);
 
         if (!$loan->isReturned()) return back()->withErrors('Loan is not returned yet.');
@@ -179,8 +180,9 @@ class LoanController extends Controller implements HasMiddleware
                     'loan_id' => $loan->id,
                     'user_id' => $loan->loanRequest->user_id,
                     'type'    => 'damaged',
-                    'amount'  => (int) ($bookPrice * $request->damage_percentage / 100),
                     'status'  => 'unpaid',
+                    'note'    => $request->note,
+                    'amount'  => (int) ($bookPrice * $request->damage_percentage / 100),
                 ]);
 
                 if ($request->damage_percentage > 50) $loan->loanRequest->bookUnit->update(['condition' => 'damaged', 'status' => 'damaged']);
@@ -191,8 +193,9 @@ class LoanController extends Controller implements HasMiddleware
                     'loan_id' => $loan->id,
                     'user_id' => $loan->loanRequest->user_id,
                     'type'    => 'lost',
-                    'amount'  => $bookPrice,
                     'status'  => 'unpaid',
+                    'note'    => $request->note,
+                    'amount'  => $bookPrice,
                 ]);
 
                 $loan->loanRequest->bookUnit->update(['condition' => 'lost', 'status' => 'lost']);

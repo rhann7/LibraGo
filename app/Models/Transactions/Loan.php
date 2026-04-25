@@ -24,5 +24,6 @@ class Loan extends Model
     public function isOverdue(): bool { return $this->status === 'overdue'; }
     public function isReturned(): bool { return $this->status === 'returned'; }
 
+    public function lateDays(): int { if (!$this->isOverdue()) return 0; return (int) now()->startOfDay()->diffInDays($this->due_date->startOfDay()); }
     public function fineAmount(): int { return $this->lateDays() * 2000; }
 }

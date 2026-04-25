@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/layouts/app-layout";
 import type { BreadcrumbItem } from "@/types/navigation";
 import type { Loan } from "@/types/transaction";
@@ -30,6 +31,7 @@ interface Props {
 
 export default function LoanShow({ loan, currentToken, can }: Props) {
     const [token, setToken] = useState('');
+    const [note, setNote] = useState('');
     const [showFineDialog, setShowFineDialog] = useState(false);
     const [damaged, setDamaged] = useState(false);
     const [lost, setLost] = useState(false);
@@ -170,6 +172,7 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                             Return processed successfully. Is there any damage or loss to report?
                         </DialogDescription>
                     </DialogHeader>
+
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <Checkbox id="damaged" checked={damaged} onCheckedChange={(val) => setDamaged(!!val)} />
@@ -184,6 +187,7 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                                 </p>
                             </div>
                         )}
+
                         <div className="flex items-center gap-3">
                             <Checkbox id="lost" checked={lost} onCheckedChange={(val) => setLost(!!val)} />
                             <Label htmlFor="lost">Book is lost</Label>
@@ -193,12 +197,21 @@ export default function LoanShow({ loan, currentToken, can }: Props) {
                                 Fine: Rp {lostFine.toLocaleString('id-ID')}
                             </p>
                         )}
+
                         {(damaged || lost) && (
                             <div className="rounded-md bg-muted/40 border border-border p-3 text-sm">
                                 <span className="text-muted-foreground">Total Additional Fine: </span>
                                 <span className="font-semibold">Rp {totalAdditionalFine.toLocaleString('id-ID')}</span>
                             </div>
                         )}
+
+                        {(damaged || lost) && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-top-2">
+                                <Label htmlFor="note">Fine Description / Note</Label>
+                                <Textarea id="note" placeholder="Contoh: Halaman 20-25 sobek atau Buku hilang saat di angkutan umum." value={note} onChange={(e) => setNote(e.target.value)} className="h-20 resize-none text-sm" />
+                            </div>
+                        )}
+
                         {bookPrice === 0 && (
                             <p className="text-xs text-destructive">
                                 Warning: Book price is not set. Damaged and lost fines will be Rp 0.

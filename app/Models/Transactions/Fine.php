@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Fine extends Model
 {
-    protected $fillable = ['loan_id', 'user_id', 'type', 'late_days', 'amount', 'status', 'paid_at'];
+    protected $fillable = ['loan_id', 'user_id', 'type', 'status', 'note', 'late_days', 'amount', 'paid_at'];
 
     protected function casts(): array
     {

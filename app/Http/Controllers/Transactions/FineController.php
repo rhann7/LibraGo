@@ -26,15 +26,16 @@ class FineController extends Controller implements HasMiddleware
 
         return $this->exportData($fines,
             'fines',
-            ['ID', 'User', 'Book', 'Type', 'Late Days', 'Amount', 'Status', 'Paid At', 'Created At'],
+            ['ID', 'User', 'Book', 'Type', 'Status', 'Note', 'Late Days', 'Amount', 'Paid At', 'Created At'],
             fn($f) => [
                 $f->id,
                 $f->user->name,
                 $f->loan->loanRequest->bookUnit->book->title,
                 $f->type,
+                $f->status,
+                $f->note ?? '-',
                 $f->late_days ?? '-',
                 $f->amount,
-                $f->status,
                 $f->paid_at?->format('d/m/Y H:i') ?? '-',
                 $f->created_at->format('d/m/Y H:i'),
             ]
@@ -100,10 +101,11 @@ class FineController extends Controller implements HasMiddleware
                 'cover_url'    => $fine->loan->loanRequest->bookUnit->book->cover_url,
             ],
             'type'             => $fine->type,
+            'status'           => $fine->status,
+            'note'             => $fine->note,
             'late_days'        => $fine->late_days,
             'amount'           => $fine->amount,
             'formatted_amount' => $fine->formatted_amount,
-            'status'           => $fine->status,
             'paid_at'          => $fine->paid_at,
             'created_at'       => $fine->created_at,
         ];
