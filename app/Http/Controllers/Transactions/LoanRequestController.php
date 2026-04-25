@@ -7,6 +7,7 @@ use App\Http\Requests\Transactions\LoanRequestRequest;
 use App\Models\Books\BookUnit;
 use App\Models\Transactions\LoanRequest;
 use App\Models\Transactions\LoanToken;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -15,6 +16,35 @@ use Inertia\Inertia;
 
 class LoanRequestController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $loanRequests = LoanRequest::query()
+            ->with(['user', 'bookUnit.book'])
+            ->when($request->search, fn($q) => $q
+                ->whereHas('user', fn($q) => $q->where('name', 'like', "%{$request->search}%"))
+                ->orWhereHas('bookUnit.book', fn($q) => $q->where('title', 'like', "%{$request->search}%")))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->latest()
+            ->get();
+
+        return $this->exportData($loanRequests,
+            'loan-requests',
+            ['ID', 'User', 'Book', 'Book Unit', 'Status', 'Note', 'Expired At', 'Created At'],
+            fn($lr) => [
+                $lr->id,
+                $lr->user->name,
+                $lr->bookUnit->book->title,
+                $lr->bookUnit->code,
+                $lr->status,
+                $lr->note ?? '-',
+                $lr->expired_at?->format('d/m/Y H:i') ?? '-',
+                $lr->created_at->format('d/m/Y H:i'),
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [

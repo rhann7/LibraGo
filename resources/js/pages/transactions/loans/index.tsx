@@ -1,5 +1,5 @@
 import { Link as InertiaLink, router } from "@inertiajs/react";
-import { BookOpen, Eye, Plus, Search } from "lucide-react";
+import { BookOpen, Download, Eye, Plus, Search } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +44,11 @@ export default function LoanIndex({ loans, filters, can }: Props) {
         router.get(route('loans.index'), { ...filters, search: e.currentTarget.value }, { preserveState: true, replace: true });
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.loans') + (params ? `?${params}` : '');
+    }
+
     const filterWidget = (
         <div className="flex items-center gap-3">
             <div className="relative">
@@ -65,10 +70,20 @@ export default function LoanIndex({ loans, filters, can }: Props) {
     );
 
     const actions = can.store ? (
-        <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" /> New Loan
+        <>
+            <Button onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" /> Export
+            </Button>
+
+            <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" /> New Loan
+            </Button>
+        </>
+    ) : (
+        <Button onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" /> Export
         </Button>
-    ) : undefined;
+    );
 
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 7);

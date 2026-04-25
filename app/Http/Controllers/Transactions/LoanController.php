@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Transactions\Fine;
 use App\Models\Transactions\Loan;
 use App\Models\Transactions\LoanToken;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -15,6 +16,35 @@ use Inertia\Inertia;
 
 class LoanController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $loans = Loan::query()
+            ->with(['loanRequest.user', 'loanRequest.bookUnit.book'])
+            ->when($request->search, fn($q) => $q->where(fn($q) => $q
+                ->whereHas('loanRequest.user', fn($q) => $q->where('name', 'like', "%{$request->search}%"))
+                ->orWhereHas('loanRequest.bookUnit.book', fn($q) => $q->where('title', 'like', "%{$request->search}%"))))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->latest()
+            ->get();
+
+        return $this->exportData($loans,
+            'loans',
+            ['ID', 'User', 'Book', 'Book Unit', 'Status', 'Borrowed At', 'Due Date', 'Returned At'],
+            fn($l) => [
+                $l->id,
+                $l->loanRequest->user->name,
+                $l->loanRequest->bookUnit->book->title,
+                $l->loanRequest->bookUnit->code,
+                $l->status,
+                $l->borrowed_at->format('d/m/Y H:i'),
+                $l->due_date->format('d/m/Y H:i'),
+                $l->returned_at?->format('d/m/Y H:i') ?? '-',
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [

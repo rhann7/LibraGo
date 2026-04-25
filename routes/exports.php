@@ -7,6 +7,9 @@ use App\Http\Controllers\Identities\StudentController;
 use App\Http\Controllers\Identities\TeacherController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Identities\UserController;
+use App\Http\Controllers\Transactions\FineController;
+use App\Http\Controllers\Transactions\LoanController;
+use App\Http\Controllers\Transactions\LoanRequestController;
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::prefix('export')->name('export.')->group(function () {
@@ -16,5 +19,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         Route::get('book-categories', [BookCategoryController::class, 'export'])->name('book-categories');
         Route::get('books', [BookController::class, 'export'])->name('books');
         Route::get('book-units', [BookUnitController::class, 'export'])->name('book-units');
+        Route::get('fines', [FineController::class, 'export'])->name('fines');
+        Route::get('loans', [LoanController::class, 'export'])->name('loans');
+        Route::get('loan-requests', [LoanRequestController::class, 'export'])->name('loan-requests');
     });
 });

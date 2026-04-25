@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/react";
-import { BookOpen, CheckCircle, Search } from "lucide-react";
+import { BookOpen, CheckCircle, Download, Search } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +51,11 @@ export default function FineIndex({ fines, filters, can }: Props) {
         }
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.fines') + (params ? `?${params}` : '');
+    };
+
     const filterWidget = (
         <div className="flex items-center gap-3">
             <div className="relative">
@@ -77,12 +82,19 @@ export default function FineIndex({ fines, filters, can }: Props) {
         </div>
     );
 
+    const actions = (
+        <Button onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" /> Export
+        </Button>
+    );
+
     return (
         <DataTableLayout
             title="Fines"
             description="Manage fines"
             breadcrumbs={breadcrumbs}
             filterWidget={filterWidget}
+            actions={actions}
             pagination={fines}
             isEmpty={fines.data.length === 0}
             emptyStateTitle="No fines found"

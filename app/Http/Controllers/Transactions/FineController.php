@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Transactions;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transactions\Fine;
+use App\Traits\CanExport;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -11,6 +12,35 @@ use Inertia\Inertia;
 
 class FineController extends Controller implements HasMiddleware
 {
+    use CanExport;
+
+    public function export(Request $request)
+    {
+        $fines = Fine::query()
+            ->with('loan.loanRequest.bookUnit.book', 'user')
+            ->when($request->search, fn($q) => $q->whereHas('user', fn($q) => $q->where('name', 'like', "%{$request->search}%")))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->type, fn($q) => $q->where('type', $request->type))
+            ->latest()
+            ->get();
+
+        return $this->exportData($fines,
+            'fines',
+            ['ID', 'User', 'Book', 'Type', 'Late Days', 'Amount', 'Status', 'Paid At', 'Created At'],
+            fn($f) => [
+                $f->id,
+                $f->user->name,
+                $f->loan->loanRequest->bookUnit->book->title,
+                $f->type,
+                $f->late_days ?? '-',
+                $f->amount,
+                $f->status,
+                $f->paid_at?->format('d/m/Y H:i') ?? '-',
+                $f->created_at->format('d/m/Y H:i'),
+            ]
+        );
+    }
+
     public static function middleware()
     {
         return [new Middleware('role:admin', only: ['update'])];

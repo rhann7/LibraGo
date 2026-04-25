@@ -1,5 +1,5 @@
 import { router, Link as InertiaLink } from "@inertiajs/react";
-import { BookOpen, Check, Eye, Search, X } from "lucide-react";
+import { BookOpen, Check, Download, Eye, Search, X } from "lucide-react";
 import type { FormEventHandler } from "react";
 import { route } from "ziggy-js";
 import InputError from '@/components/input-error';
@@ -46,6 +46,11 @@ export default function LoanRequestIndex({ requests, filters, can }: Props) {
         router.get(route('loan-requests.index'), { ...filters, search: e.currentTarget.value }, { preserveState: true, replace: true });
     };
 
+    const handleExport = () => {
+        const params = new URLSearchParams(window.location.search).toString();
+        window.location.href = route('export.loan-requests') + (params ? `?${params}` : '');
+    };
+
     const filterWidget = (
         <div className="flex items-center gap-3">
             <div className="relative">
@@ -68,12 +73,19 @@ export default function LoanRequestIndex({ requests, filters, can }: Props) {
         </div>
     );
 
+    const actions = (
+        <Button onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" /> Export
+        </Button>
+    );
+
     return (
         <>
             <DataTableLayout
                 title="Loan Requests"
                 description="Manage incoming loan requests"
                 breadcrumbs={breadcrumbs}
+                actions={actions}
                 filterWidget={filterWidget}
                 pagination={requests}
                 isEmpty={requests.data.length === 0}
