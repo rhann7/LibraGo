@@ -23,7 +23,7 @@ class HandleInertiaRequests extends Middleware
                 'user'             => $request->user()?->load(['student', 'teacher']),
                 'roles'            => $request->user()?->getRoleNames() ?? [],
                 'has_overdue_loan' => $request->user()?->hasOverdueLoan() ?? false,
-                'has_unpaid_fine'  => $request->user()?->fines()->where('status', 'unpaid')->exists() ?? false,
+                'has_unpaid_fine'  => $request->user()?->hasUnpaidFine() ?? false,
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),

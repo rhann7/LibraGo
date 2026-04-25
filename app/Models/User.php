@@ -40,4 +40,5 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getAvatarUrlAttribute(): ?string { $profile = $this->student ?? $this->teacher; return $profile?->avatar_url; }
     public function hasOverdueLoan(): bool { return $this->loans()->where('loans.status', 'overdue')->exists(); }
+    public function hasUnpaidFine(): bool { return $this->fines()->where('status', 'unpaid')->exists(); }
 }

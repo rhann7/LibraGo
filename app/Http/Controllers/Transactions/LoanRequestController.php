@@ -71,6 +71,7 @@ class LoanRequestController extends Controller implements HasMiddleware
     {
         $user = $request->user();
         if ($user->hasOverdueLoan()) return back()->withErrors(['overdue' => 'You have an overdue loan. Please return it before making a new request.']);
+        if ($user->hasUnpaidFine()) return back()->withErrors(['fine' => 'You have an unpaid fine. Please settle your payment before borrowing.']);
 
         $bookUnit = BookUnit::findOrFail($request->book_unit_id);
         if ($bookUnit->status !== 'available') return back()->withErrors('Book unit is not available for loan');

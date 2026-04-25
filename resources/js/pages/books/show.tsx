@@ -88,6 +88,11 @@ export default function BookShow({ book, bookUnit, activeRequest }: Props) {
                                 <BookOpen className="h-4 w-4" />
                                 You have an overdue loan
                             </button>
+                        ) : auth.has_unpaid_fine ? (
+                            <button disabled className="inline-flex items-center gap-2 rounded-sm bg-foreground px-8 py-2.5 text-sm font-medium text-background opacity-50 cursor-not-allowed">
+                                <BookOpen className="h-4 w-4" />
+                                You have an unpaid fine
+                            </button>
                         ) : (
                             <button disabled={!bookUnit} onClick={() => { if (!bookUnit) return; if (!confirm(`Borrow "${book.title}"?`)) return; router.post(route('loan-requests.store'), { book_unit_id: bookUnit.id }, { preserveScroll: true }); }} className={`inline-flex items-center gap-2 rounded-sm bg-foreground px-8 py-2.5 text-sm font-medium text-background ${!bookUnit ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-90'}`}>
                                 <BookOpen className="h-4 w-4" />
